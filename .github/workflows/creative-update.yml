@@ -1,0 +1,64 @@
+# Authored: Albert Lane | Documented: Claude Sonnet 4.6 | 2026-06-10
+# Fires at :15 every hour — 15 minutes after RoadMaps' simcity-dispatch.
+# Reads updates/latest.json (written by RoadMaps), advances creative state,
+# and rewrites README.md with styled public output.
+# Recursive: creative-state.json carries narrative arc across runs.
+
+name: Creative Update
+
+on:
+  schedule:
+    - cron: '15 * * * *'
+  workflow_dispatch:
+    inputs:
+      force_reset:
+        description: 'Reset creative state to iteration 0'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    name: Render Creative Update
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout SimCity
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Reset creative state
+        if: ${{ github.event.inputs.force_reset == 'true' }}
+        run: |
+          python3 -c "
+import json
+state = {'iteration': 0, 'arc_stage': 0, 'motifs': [], 'last_signal': ''}
+open('creative-state.json','w').write(json.dumps(state, indent=2))
+print('Creative state reset to iteration 0')
+"
+
+      - name: Run creative engine
+        run: python scripts/creative_engine.py
+
+      - name: Commit and push
+        run: |
+          git config user.email "noreply@anthropic.com"
+          git config user.name "Claude"
+          git add README.md creative-state.json
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: creative update $(date -u +%Y-%m-%dT%H:%M:%SZ)
+
+Co-authored-by: Claude Sonnet 4.6 <claude@anthropic.com>"
+            git push origin main
+            echo "SimCity README updated"
+          else
+            echo "No changes this cycle"
+          fi
