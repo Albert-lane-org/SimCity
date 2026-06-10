@@ -1,0 +1,48 @@
+{
+  "schema": "1.0.0",
+  "generated_at": "2026-06-10T00:00:00Z",
+  "source_sync": "2026-06-10T00:00:00Z",
+  "momentum": "steady",
+  "aggregate": {
+    "zones_active": 3,
+    "zones_operational": 1,
+    "phases_complete": 4,
+    "phases_in_progress": 3
+  },
+  "zones": [
+    {
+      "zone": "City Hall",
+      "layer": "navigation",
+      "description": "Coordination and navigation hub",
+      "active_phase": "Foundation",
+      "completion": 100,
+      "status": "operational"
+    },
+    {
+      "zone": "Gateway District",
+      "layer": "infrastructure",
+      "description": "Universal access layer — the city's programmatic exchange",
+      "active_phase": "Integration",
+      "completion": 60,
+      "status": "building"
+    },
+    {
+      "zone": "Intelligence Core",
+      "layer": "data",
+      "description": "XML-native knowledge pipeline — civic and registry memory",
+      "active_phase": "Integration",
+      "completion": 75,
+      "status": "building"
+    },
+    {
+      "zone": "Sovereign Quarters",
+      "layer": "interface",
+      "description": "Cryptographic identity browser — the citizen's interface",
+      "active_phase": "Integration",
+      "completion": 55,
+      "status": "building"
+    }
+  ],
+  "creative_tags": ["civic-infrastructure", "sovereign-tech", "open-design", "designer-invitation"],
+  "signal": "Walls rise. The blueprint holds."
+}
