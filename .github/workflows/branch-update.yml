@@ -1,0 +1,165 @@
+# Authored: Albert Lane | Documented: Claude Sonnet 4.6 | 2026-06-11
+# branch-update.yml — Auto-rebase all open PR branches onto main.
+#
+# Triggers on every push to main. For each open PR targeting main:
+#   1. Checks if the branch is behind (mergeable_state != clean/has_hooks)
+#   2. Attempts `git rebase origin/main` on the PR branch
+#   3. On clean rebase: force-pushes the updated branch (PR auto-updates)
+#   4. On conflict: leaves branch untouched, opens a GitHub issue tagging
+#      the conflict files so a human can resolve
+#
+# This eliminates the "dirty" PR state that blocks merges. Every PR
+# stays rebased. No manual "Update branch" button clicking.
+#
+# Requires: _ROADMAPS secret with contents:write + pull-requests:read
+# + issues:write on this repo.
+
+name: Auto-Rebase Open PRs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Detect diverged branches only — do not push"
+        required: false
+        default: "false"
+
+permissions:
+  contents: write
+  pull-requests: read
+  issues: write
+
+jobs:
+  rebase-prs:
+    name: Rebase open PR branches onto main
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        with:
+          token: ${{ secrets._ROADMAPS }}
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "AlbertLane+Anthropic"
+          git config user.email "noreply@anthropic.com"
+
+      - name: Fetch all branches
+        run: git fetch --all --prune
+
+      - name: Rebase open PR branches
+        env:
+          GH_TOKEN: ${{ secrets._ROADMAPS }}
+          REPO: ${{ github.repository }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+        run: |
+          set -euo pipefail
+
+          # List open PRs targeting main
+          PRS=$(curl -s \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${REPO}/pulls?state=open&base=main&per_page=50" \
+          )
+
+          PR_COUNT=$(echo "$PRS" | jq 'length')
+          echo "Found ${PR_COUNT} open PR(s) targeting main."
+
+          echo "$PRS" | jq -c '.[]' | while IFS= read -r PR; do
+            PR_NUMBER=$(echo "$PR" | jq -r '.number')
+            PR_TITLE=$(echo "$PR"  | jq -r '.title')
+            HEAD_REF=$(echo "$PR"  | jq -r '.head.ref')
+            HEAD_SHA=$(echo "$PR"  | jq -r '.head.sha')
+            MERGEABLE=$(echo "$PR" | jq -r '.mergeable_state // "unknown"')
+
+            echo ""
+            echo "=== PR #${PR_NUMBER}: ${PR_TITLE} (${HEAD_REF}) — mergeable_state=${MERGEABLE} ==="
+
+            # Already clean — nothing to do
+            if [[ "$MERGEABLE" == "clean" || "$MERGEABLE" == "has_hooks" ]]; then
+              echo "  Already up-to-date. Skipping."
+              continue
+            fi
+
+            # Check out the PR branch
+            if ! git checkout -B "pr-rebase/${PR_NUMBER}" "origin/${HEAD_REF}" 2>/dev/null; then
+              echo "  WARNING: Could not check out origin/${HEAD_REF} — branch may not exist remotely. Skipping."
+              continue
+            fi
+
+            # Attempt rebase onto main
+            REBASE_OUT=$(git rebase origin/main 2>&1) && REBASE_OK=true || REBASE_OK=false
+
+            if [[ "$REBASE_OK" == "true" ]]; then
+              echo "  Rebase succeeded."
+              if [[ "$DRY_RUN" == "true" ]]; then
+                echo "  [dry-run] Would force-push ${HEAD_REF}."
+              else
+                git push origin "HEAD:${HEAD_REF}" --force
+                echo "  Force-pushed updated ${HEAD_REF}."
+              fi
+            else
+              echo "  Rebase FAILED — conflicts detected."
+              CONFLICT_FILES=$(git diff --name-only --diff-filter=U 2>/dev/null || echo "unknown")
+              echo "  Conflicting files: ${CONFLICT_FILES}"
+
+              # Abort to restore clean state
+              git rebase --abort 2>/dev/null || true
+
+              # Open or update a conflict issue
+              ISSUE_TITLE="[branch-update] Merge conflict: PR #${PR_NUMBER} (${HEAD_REF})"
+              ISSUE_BODY="## Branch Update: Rebase Conflict\n\n**PR:** [#${PR_NUMBER}](https://github.com/${REPO}/pull/${PR_NUMBER})\n**Branch:** \`${HEAD_REF}\`\n**Head SHA:** \`${HEAD_SHA:0:12}\`\n**Conflicting files:**\n\`\`\`\n${CONFLICT_FILES}\n\`\`\`\n\n**How to fix:**\n\`\`\`bash\ngit fetch origin\ngit checkout ${HEAD_REF}\ngit rebase origin/main\n# resolve conflicts in the files above\ngit add <resolved-files>\ngit rebase --continue\ngit push origin ${HEAD_REF} --force\n\`\`\`\n\n---\n*Auto-opened by branch-update.yml. Close when resolved.*"
+
+              EXISTING=$(curl -s \
+                -H "Authorization: Bearer ${GH_TOKEN}" \
+                -H "Accept: application/vnd.github+json" \
+                -H "X-GitHub-Api-Version: 2022-11-28" \
+                "https://api.github.com/repos/${REPO}/issues?state=open&labels=merge-conflict&per_page=50" \
+                | jq -r --arg title "$ISSUE_TITLE" '.[] | select(.title == $title) | .number' | head -1)
+
+              if [[ -n "$EXISTING" ]]; then
+                echo "  Issue #${EXISTING} already open — adding comment."
+                curl -s -X POST \
+                  -H "Authorization: Bearer ${GH_TOKEN}" \
+                  -H "Accept: application/vnd.github+json" \
+                  -H "X-GitHub-Api-Version: 2022-11-28" \
+                  "https://api.github.com/repos/${REPO}/issues/${EXISTING}/comments" \
+                  -d "$(jq -cn --arg body "Still conflicting as of $(date -u +%Y-%m-%dT%H:%M:%SZ). Files: ${CONFLICT_FILES}" '{body: $body}')" \
+                  > /dev/null
+              else
+                # Ensure label exists
+                curl -s -X POST \
+                  -H "Authorization: Bearer ${GH_TOKEN}" \
+                  -H "Accept: application/vnd.github+json" \
+                  -H "X-GitHub-Api-Version: 2022-11-28" \
+                  "https://api.github.com/repos/${REPO}/labels" \
+                  -d '{"name":"merge-conflict","color":"e4e669","description":"Branch needs manual rebase"}' \
+                  > /dev/null 2>&1 || true
+
+                curl -s -X POST \
+                  -H "Authorization: Bearer ${GH_TOKEN}" \
+                  -H "Accept: application/vnd.github+json" \
+                  -H "X-GitHub-Api-Version: 2022-11-28" \
+                  "https://api.github.com/repos/${REPO}/issues" \
+                  -d "$(jq -cn \
+                    --arg title "$ISSUE_TITLE" \
+                    --arg body "$ISSUE_BODY" \
+                    '{title: $title, body: $body, labels: ["merge-conflict"]}' \
+                  )" \
+                  > /dev/null
+                echo "  Conflict issue created."
+              fi
+            fi
+
+            # Clean up temp branch
+            git checkout main 2>/dev/null || git checkout -
+            git branch -D "pr-rebase/${PR_NUMBER}" 2>/dev/null || true
+          done
+
+          echo ""
+          echo "branch-update: done."
