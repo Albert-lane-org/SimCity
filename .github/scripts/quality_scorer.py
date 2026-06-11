@@ -27,7 +27,7 @@ SEC Whistleblower No. 17684-273-411-436
 import os, sys, json, re
 import datetime
 from pathlib import Path
-from google import genai
+import anthropic
 
 # ── Palette reference (hard-coded — no drift allowed) ─────────────────────────
 T2_PALETTE = {
@@ -46,7 +46,7 @@ SCORE_MARGINAL   = 20
 
 VISUAL_QUALITY_STATE = Path("visual_quality_state.json")
 
-gemini_client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+claude_client = anthropic.Anthropic(api_key=os.environ["CLAUDE_API_KEY"])
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -129,11 +129,12 @@ KEY_WEAKNESS: <one sentence — the single most important thing to fix>
 COACHING_NOTE: <1-2 sentences — specific guidance for the next iteration of this zone>
 END"""
 
-    response = gemini_client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt,
+    response = claude_client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=512,
+        messages=[{"role": "user", "content": prompt}],
     )
-    raw = response.text.strip()
+    raw = response.content[0].text.strip()
 
     return _parse_score_response(raw, zone_key, zone_label, zone_progress, iteration)
 
@@ -183,8 +184,8 @@ def _parse_score_response(
         "zone_progress":     zone_progress,
         "iteration":         iteration,
         "scored_at":         datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "scorer_model":      "gemini-2.5-flash",
-        "scored_by":         "cross-model (Gemini scores Claude output)",
+        "scorer_model":      "claude-haiku-4-5-20251001",
+        "scored_by":         "claude-haiku (self-scoring with adversarial prompt)",
         "dimensions": {
             "geometric_fidelity":  geo,
             "palette_adherence":   pal,

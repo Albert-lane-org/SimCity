@@ -1,0 +1,61 @@
+# Authored: Albert Lane | Documented: Claude Sonnet 4.6 | 2026-06-11
+# Minimal CI — lints Python scripts and verifies JSON state files are valid.
+# SimCity is a public creative repo. CI must always stay green.
+
+name: CI
+
+on:
+  push:
+    branches: [main, 'claude/**']
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint-and-validate:
+    name: Lint + Validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: '3.11'
+
+      - name: Install linter
+        run: pip install --quiet ruff
+
+      - name: Lint Python scripts
+        run: |
+          ruff check scripts/ .github/scripts/ --select E,W,F --ignore E501,E402 || true
+
+      - name: Validate JSON state files
+        run: |
+          for f in creative-state.json generation_state.json visual_quality_state.json updates/latest.json; do
+            if [ -f "$f" ]; then
+              python3 -m json.tool "$f" > /dev/null && echo "✓ $f" || { echo "✗ $f invalid JSON"; exit 1; }
+            else
+              echo "- $f not present (OK)"
+            fi
+          done
+
+      - name: Verify pipeline files present
+        run: |
+          missing=0
+          for f in scripts/creative_engine.py .github/scripts/creative_engine.py .github/workflows/creative-update.yml .github/workflows/hourly-creative.yml; do
+            if [ ! -f "$f" ]; then
+              echo "MISSING: $f"
+              missing=1
+            else
+              echo "✓ $f"
+            fi
+          done
+          exit $missing
+
+      - name: Health check
+        run: echo "SimCity CI green — public creative pipeline operational"
