@@ -1,37 +1,26 @@
+# Authored: Albert Lane | Documented: Claude Sonnet 4.6 | 2026-06-12
 name: Autonomous Regen Request
 
-# ── Trigger ───────────────────────────────────────────────────────────────────
-# Daily at 08:00 UTC. Scans quality state and autonomously creates design-request
-# issues for zones with sustained below-threshold scores.
-#
-# This gives the system genuine agency: it identifies its own weak spots
-# and files requests through the existing design-loop.yml pipeline.
-#
-# The design loop was always label-gated. Now the system can label its own gates.
-#
 # AUTHORED: Albert Lane | SovereignAudits™ | albertlane.net
 # SEC Whistleblower No. 17684-273-411-436
 on:
   schedule:
-    - cron: '0 8 * * *'   # Daily 08:00 UTC
+    - cron: '0 8 * * *'
   workflow_dispatch:
     inputs:
       force_zone:
-        description: 'Force a request for a specific zone (overrides threshold check)'
+        description: 'Force a request for a specific zone'
         required: false
         default: ''
 
 permissions:
-  issues:   write
+  issues: write
   contents: read
 
 jobs:
-
   check-and-request:
     runs-on: ubuntu-latest
-
     steps:
-
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
         with:
@@ -42,7 +31,6 @@ jobs:
         with:
           python-version: '3.11'
 
-      # ── Compute which zones need autonomous requests ───────────────────────
       - name: Determine zones needing regen
         id: zones
         env:
@@ -51,12 +39,10 @@ jobs:
           python3 - <<'PYEOF'
           import os, json, sys
           from pathlib import Path
-
           QUALITY_STATE = Path("visual_quality_state.json")
-          THRESHOLD     = 26
+          THRESHOLD = 26
           STREAK_NEEDED = 3
-          FORCE_ZONE    = os.environ.get("FORCE_ZONE", "").strip()
-
+          FORCE_ZONE = os.environ.get("FORCE_ZONE", "").strip()
           if FORCE_ZONE:
               print(f"[autonomous] Force zone: {FORCE_ZONE}")
               out = os.environ.get("GITHUB_OUTPUT", "")
@@ -64,21 +50,18 @@ jobs:
                   with open(out, "a") as f:
                       f.write(f"zones={FORCE_ZONE}\n")
               sys.exit(0)
-
           if not QUALITY_STATE.exists():
-              print("[autonomous] No quality state found — skipping.", file=sys.stderr)
+              print("[autonomous] No quality state found - skipping.", file=sys.stderr)
               out = os.environ.get("GITHUB_OUTPUT", "")
               if out:
                   with open(out, "a") as f:
                       f.write("zones=\n")
               sys.exit(0)
-
           state = json.loads(QUALITY_STATE.read_text())
           needs_regen = [
               zk for zk, zd in state.get("zones", {}).items()
               if zd.get("below_threshold_streak", 0) >= STREAK_NEEDED
           ]
-
           print(f"[autonomous] Zones needing regen: {needs_regen}")
           out = os.environ.get("GITHUB_OUTPUT", "")
           if out:
@@ -86,7 +69,6 @@ jobs:
                   f.write(f"zones={','.join(needs_regen)}\n")
           PYEOF
 
-      # ── Create design-request issues for qualifying zones ─────────────────
       - name: Create autonomous design requests
         if: steps.zones.outputs.zones != ''
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
@@ -94,82 +76,35 @@ jobs:
           ZONES: ${{ steps.zones.outputs.zones }}
         with:
           script: |
-            const zonesRaw = process.env.ZONES || "";
-            const zones    = zonesRaw.split(",").map(z => z.trim()).filter(Boolean);
-
+            const zones = (process.env.ZONES || "").split(",").map(z => z.trim()).filter(Boolean);
             const ZONE_LABELS = {
-              city_hall:          "City Hall",
-              gateway_district:   "Gateway District",
-              intelligence_core:  "Intelligence Core",
-              sovereign_quarters: "Sovereign Quarters",
+              city_hall: "City Hall", gateway_district: "Gateway District",
+              intelligence_core: "Intelligence Core", sovereign_quarters: "Sovereign Quarters",
             };
-
-            const ZONE_CONCEPTS = {
-              city_hall:          "Facade detail improvement — clock tower prominence and shadow fidelity",
-              gateway_district:   "Rail line convergence with elevated walkway depth layers",
-              intelligence_core:  "Server rack density increase with status-light grid variation",
-              sovereign_quarters: "Terminal bay stacking with antenna array focal point",
-            };
-
             for (const zone of zones) {
-              // Check for already-open auto-regen issues for this zone
-              const openIssues = await github.rest.issues.listForRepo({
-                owner:  context.repo.owner,
-                repo:   context.repo.repo,
-                state:  "open",
-                labels: "auto-regen",
+              const open = await github.rest.issues.listForRepo({
+                owner: context.repo.owner, repo: context.repo.repo,
+                state: "open", labels: "auto-regen",
               });
-
-              const alreadyOpen = openIssues.data.some(i =>
-                i.title.toLowerCase().includes(zone.toLowerCase())
-              );
-
-              if (alreadyOpen) {
-                console.log(`[autonomous] Open auto-regen issue already exists for ${zone} — skipping.`);
-                continue;
-              }
-
-              const zoneLabel   = ZONE_LABELS[zone]   || zone;
-              const zoneConcept = ZONE_CONCEPTS[zone] || "Quality improvement regeneration";
-
-              // Create the issue — this triggers design-loop.yml when labelled
+              if (open.data.some(i => i.title.toLowerCase().includes(zone))) continue;
+              const zoneLabel = ZONE_LABELS[zone] || zone;
               const issue = await github.rest.issues.create({
-                owner:  context.repo.owner,
-                repo:   context.repo.repo,
-                title:  `[Auto] ${zoneLabel} — quality improvement request`,
-                labels: ["auto-regen"],   // NOT yet design-request — needs human approval
+                owner: context.repo.owner, repo: context.repo.repo,
+                title: `[Auto] ${zoneLabel} - quality improvement request`,
+                labels: ["auto-regen"],
                 body: [
-                  `### Concept`,
-                  zoneConcept,
-                  ``,
-                  `### Zone`,
-                  zoneLabel,
-                  ``,
-                  `### Visual Context`,
-                  [
-                    `This is an autonomous quality improvement request generated by the SimCity`,
-                    `Creative Engine. The ${zoneLabel} zone has scored below the 26/40 quality`,
-                    `threshold for 3 or more consecutive iterations.`,
-                    ``,
-                    `Apply the current style evolution notes for this zone.`,
-                    `Target score: ≥ 26/40. Focus on the specific weakness identified by`,
-                    `the quality scorer (geometric fidelity, palette adherence, structural`,
-                    `richness, or progress alignment).`,
-                    ``,
-                    `To trigger generation: add the \`design-request\` label to this issue.`,
-                    `To dismiss: close this issue.`,
-                  ].join("\n"),
-                  ``,
-                  `---`,
-                  `*Autonomous request by SimCity Creative Engine*`,
-                  `*Albert Lane | SovereignAudits™ | SEC Ref: 17684-273-411-436*`,
+                  "### Concept",
+                  `Quality improvement for ${zoneLabel}`,
+                  "### Zone", zoneLabel,
+                  "### Visual Context",
+                  `Below 26/40 threshold for 3+ consecutive iterations. Target: >=26/40.`,
+                  "To trigger generation: add the 'design-request' label.",
+                  "---",
+                  "*Albert Lane | SovereignAudits™ | SEC Ref: 17684-273-411-436*",
                 ].join("\n"),
               });
-
-              console.log(`[autonomous] Created issue #${issue.data.number} for zone: ${zone}`);
+              console.log(`Created issue #${issue.data.number} for ${zone}`);
             }
 
-      # ── Summary ───────────────────────────────────────────────────────────
       - name: Log summary
-        run: |
-          echo "[autonomous] Scan complete. Zones checked: ${{ steps.zones.outputs.zones || 'none' }}"
+        run: echo "[autonomous] Scan complete. Zones: ${{ steps.zones.outputs.zones || 'none' }}"
