@@ -576,12 +576,18 @@ def main():
     out = os.environ.get("GITHUB_OUTPUT", "")
     if out:
         zone = zone_data["zones"][zone_key]
+        # Strip newlines to prevent GITHUB_OUTPUT variable injection via zone data
+        safe_zone_key   = str(zone_key).replace("\n", "").replace("\r", "")
+        safe_zone_label = str(zone_label).replace("\n", "").replace("\r", "")
+        safe_progress   = str(zone["progress"]).replace("\n", "").replace("\r", "")
+        safe_iteration  = str(iteration).replace("\n", "").replace("\r", "")
+        safe_svg_path   = str(svg_path).replace("\n", "").replace("\r", "")
         with open(out, "a") as f:
-            f.write(f"zone_key={zone_key}\n")
-            f.write(f"zone_label={zone_label}\n")
-            f.write(f"zone_progress={zone['progress']}\n")
-            f.write(f"iteration={iteration}\n")
-            f.write(f"svg_path={svg_path}\n")
+            f.write(f"zone_key={safe_zone_key}\n")
+            f.write(f"zone_label={safe_zone_label}\n")
+            f.write(f"zone_progress={safe_progress}\n")
+            f.write(f"iteration={safe_iteration}\n")
+            f.write(f"svg_path={safe_svg_path}\n")
 
     print(f"[main] Done. Zone={zone_key}, Iteration={iteration}")
 
@@ -1108,12 +1114,18 @@ def main():
     out = os.environ.get("GITHUB_OUTPUT", "")
     if out:
         zone = zone_data["zones"][zone_key]
+        # Strip newlines to prevent GITHUB_OUTPUT variable injection via zone data
+        safe_zone_key   = str(zone_key).replace("\n", "").replace("\r", "")
+        safe_zone_label = str(zone_label).replace("\n", "").replace("\r", "")
+        safe_progress   = str(zone["progress"]).replace("\n", "").replace("\r", "")
+        safe_iteration  = str(iteration).replace("\n", "").replace("\r", "")
+        safe_svg_path   = str(svg_path).replace("\n", "").replace("\r", "")
         with open(out, "a") as f:
-            f.write(f"zone_key={zone_key}\n")
-            f.write(f"zone_label={zone_label}\n")
-            f.write(f"zone_progress={zone['progress']}\n")
-            f.write(f"iteration={iteration}\n")
-            f.write(f"svg_path={svg_path}\n")
+            f.write(f"zone_key={safe_zone_key}\n")
+            f.write(f"zone_label={safe_zone_label}\n")
+            f.write(f"zone_progress={safe_progress}\n")
+            f.write(f"iteration={safe_iteration}\n")
+            f.write(f"svg_path={safe_svg_path}\n")
 
     print(f"[main] Done. Zone={zone_key}, Iteration={iteration}")
 
