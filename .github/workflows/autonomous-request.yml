@@ -1,6 +1,8 @@
 # Authored: Albert Lane | Documented: Claude Sonnet 4.6 | 2026-06-12
 name: Autonomous Regen Request
 
+# Daily at 08:00 UTC. Scans quality state and autonomously creates design-request
+# issues for zones with sustained below-threshold scores.
 # AUTHORED: Albert Lane | SovereignAudits™ | albertlane.net
 # SEC Whistleblower No. 17684-273-411-436
 on:
@@ -9,27 +11,30 @@ on:
   workflow_dispatch:
     inputs:
       force_zone:
-        description: 'Force a request for a specific zone'
+        description: 'Force a request for a specific zone (overrides threshold check)'
         required: false
         default: ''
 
 permissions:
-  issues: write
+  issues:   write
   contents: read
 
 jobs:
+
   check-and-request:
     runs-on: ubuntu-latest
+
     steps:
+
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
         with:
           fetch-depth: 1
 
-      - name: Set up Python 3.11
+      - name: Set up Python 3.12
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
         with:
-          python-version: '3.11'
+          python-version: '3.12'
 
       - name: Determine zones needing regen
         id: zones
@@ -39,10 +44,12 @@ jobs:
           python3 - <<'PYEOF'
           import os, json, sys
           from pathlib import Path
+
           QUALITY_STATE = Path("visual_quality_state.json")
-          THRESHOLD = 26
+          THRESHOLD     = 26
           STREAK_NEEDED = 3
-          FORCE_ZONE = os.environ.get("FORCE_ZONE", "").strip()
+          FORCE_ZONE    = os.environ.get("FORCE_ZONE", "").strip()
+
           if FORCE_ZONE:
               print(f"[autonomous] Force zone: {FORCE_ZONE}")
               out = os.environ.get("GITHUB_OUTPUT", "")
@@ -50,18 +57,21 @@ jobs:
                   with open(out, "a") as f:
                       f.write(f"zones={FORCE_ZONE}\n")
               sys.exit(0)
+
           if not QUALITY_STATE.exists():
-              print("[autonomous] No quality state found - skipping.", file=sys.stderr)
+              print("[autonomous] No quality state found — skipping.", file=sys.stderr)
               out = os.environ.get("GITHUB_OUTPUT", "")
               if out:
                   with open(out, "a") as f:
                       f.write("zones=\n")
               sys.exit(0)
+
           state = json.loads(QUALITY_STATE.read_text())
           needs_regen = [
               zk for zk, zd in state.get("zones", {}).items()
               if zd.get("below_threshold_streak", 0) >= STREAK_NEEDED
           ]
+
           print(f"[autonomous] Zones needing regen: {needs_regen}")
           out = os.environ.get("GITHUB_OUTPUT", "")
           if out:
@@ -71,40 +81,80 @@ jobs:
 
       - name: Create autonomous design requests
         if: steps.zones.outputs.zones != ''
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
+        uses: actions/github-script@v7
         env:
           ZONES: ${{ steps.zones.outputs.zones }}
         with:
           script: |
-            const zones = (process.env.ZONES || "").split(",").map(z => z.trim()).filter(Boolean);
+            const zonesRaw = process.env.ZONES || "";
+            const zones    = zonesRaw.split(",").map(z => z.trim()).filter(Boolean);
+
             const ZONE_LABELS = {
-              city_hall: "City Hall", gateway_district: "Gateway District",
-              intelligence_core: "Intelligence Core", sovereign_quarters: "Sovereign Quarters",
+              city_hall:          "City Hall",
+              gateway_district:   "Gateway District",
+              intelligence_core:  "Intelligence Core",
+              sovereign_quarters: "Sovereign Quarters",
             };
+
+            const ZONE_CONCEPTS = {
+              city_hall:          "Facade detail improvement — clock tower prominence and shadow fidelity",
+              gateway_district:   "Rail line convergence with elevated walkway depth layers",
+              intelligence_core:  "Server rack density increase with status-light grid variation",
+              sovereign_quarters: "Terminal bay stacking with antenna array focal point",
+            };
+
             for (const zone of zones) {
-              const open = await github.rest.issues.listForRepo({
-                owner: context.repo.owner, repo: context.repo.repo,
-                state: "open", labels: "auto-regen",
+              const openIssues = await github.rest.issues.listForRepo({
+                owner:  context.repo.owner,
+                repo:   context.repo.repo,
+                state:  "open",
+                labels: "auto-regen",
               });
-              if (open.data.some(i => i.title.toLowerCase().includes(zone))) continue;
-              const zoneLabel = ZONE_LABELS[zone] || zone;
+
+              const alreadyOpen = openIssues.data.some(i =>
+                i.title.toLowerCase().includes(zone.toLowerCase())
+              );
+
+              if (alreadyOpen) {
+                console.log(`[autonomous] Open auto-regen issue already exists for ${zone} — skipping.`);
+                continue;
+              }
+
+              const zoneLabel   = ZONE_LABELS[zone]   || zone;
+              const zoneConcept = ZONE_CONCEPTS[zone] || "Quality improvement regeneration";
+
               const issue = await github.rest.issues.create({
-                owner: context.repo.owner, repo: context.repo.repo,
-                title: `[Auto] ${zoneLabel} - quality improvement request`,
+                owner:  context.repo.owner,
+                repo:   context.repo.repo,
+                title:  `[Auto] ${zoneLabel} — quality improvement request`,
                 labels: ["auto-regen"],
                 body: [
-                  "### Concept",
-                  `Quality improvement for ${zoneLabel}`,
-                  "### Zone", zoneLabel,
-                  "### Visual Context",
-                  `Below 26/40 threshold for 3+ consecutive iterations. Target: >=26/40.`,
-                  "To trigger generation: add the 'design-request' label.",
-                  "---",
-                  "*Albert Lane | SovereignAudits™ | SEC Ref: 17684-273-411-436*",
+                  `### Concept`,
+                  zoneConcept,
+                  ``,
+                  `### Zone`,
+                  zoneLabel,
+                  ``,
+                  `### Visual Context`,
+                  `This is an autonomous quality improvement request generated by the SimCity`,
+                  `Creative Engine. The ${zoneLabel} zone has scored below the 26/40 quality`,
+                  `threshold for 3 or more consecutive iterations.`,
+                  ``,
+                  `Apply current style evolution notes for this zone.`,
+                  `Target score: >= 26/40.`,
+                  ``,
+                  `To trigger generation: add the \`design-request\` label to this issue.`,
+                  `To dismiss: close this issue.`,
+                  ``,
+                  `---`,
+                  `*Autonomous request by SimCity Creative Engine*`,
+                  `*Albert Lane | SovereignAudits™ | SEC Ref: 17684-273-411-436*`,
                 ].join("\n"),
               });
-              console.log(`Created issue #${issue.data.number} for ${zone}`);
+
+              console.log(`[autonomous] Created issue #${issue.data.number} for zone: ${zone}`);
             }
 
       - name: Log summary
-        run: echo "[autonomous] Scan complete. Zones: ${{ steps.zones.outputs.zones || 'none' }}"
+        run: |
+          echo "[autonomous] Scan complete. Zones checked: ${{ steps.zones.outputs.zones || 'none' }}"
