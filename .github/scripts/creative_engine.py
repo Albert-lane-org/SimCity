@@ -20,7 +20,7 @@ from pathlib import Path
 from anthropic import Anthropic
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-ROOT               = Path(__file__).parent.parent
+ROOT               = Path(__file__).resolve().parents[2]
 ZONE_STATE         = ROOT / "updates" / "latest.json"
 GEN_STATE          = ROOT / "generation_state.json"
 VISUAL_QUALITY     = ROOT / "visual_quality_state.json"
