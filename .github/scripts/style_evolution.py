@@ -156,7 +156,9 @@ def run_evolution():
     # ── Write evolved notes into generation_state.json ────────────────────────
     # The creative_engine.py reads this file — it now picks up evolution notes
     if gen_state and evolved_notes:
-        gen_state["style_evolution"] = evolved_notes
+        existing = gen_state.get("style_evolution", {})
+        existing.update(evolved_notes)
+        gen_state["style_evolution"] = existing
         gen_state["style_evolution_last_updated"] = timestamp
         GEN_STATE.write_text(json.dumps(gen_state, indent=2))
         print(f"[style_evolution] Updated generation_state.json with evolution notes.", file=sys.stderr)
