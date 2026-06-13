@@ -15,7 +15,7 @@ MECHANISM:
   4. Updates both visual_quality_state.json and generation_state.json
   5. Appends findings to CREATIVE_CHANGELOG.md
 
-RUNS: Weekly (Sunday 06:00 UTC via autonomous-request.yml) or manually.
+RUNS: Weekly (Wednesday 05:00 UTC via self-improve-creative.yml) or manually.
 
 AUTHORED: Albert Lane | SovereignAudits™ | albertlane.net
 SEC Whistleblower No. 17684-273-411-436
