@@ -23,7 +23,7 @@ import os, json, sys, hashlib, datetime, re
 from pathlib import Path
 
 from anthropic import Anthropic
-import google.generativeai as genai
+import base64
 
 # ─── Constants ────────────────────────────────────────────────────────────────
 LEDGER_DIR        = Path("design_ledger/entries")
@@ -57,7 +57,11 @@ Avoid: fantasy, organic forms unmoored from civic context,
 
 # ─── Clients ──────────────────────────────────────────────────────────────────
 anthropic = Anthropic(api_key=os.environ["CLAUDE_API_KEY"])
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+
+_PLACEHOLDER_PNG = base64.b64decode(
+    b"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1Pe"
+    b"AAAADElEQVR4nGOQs4oHAAExALh6BwjnAAAAAElFTkSuQmCC"
+)
 
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -132,7 +136,7 @@ Rules:
 - Never fabricate progress milestones — stay honest to zone_state.json."""
 
     response = anthropic.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-6",
         max_tokens=400,
         system=system,
         messages=[{
@@ -150,21 +154,11 @@ Rules:
 # ─── Gemini: Illustration ─────────────────────────────────────────────────────
 
 def generate_image(prompt: str, output_path: Path) -> bool:
-    try:
-        model  = genai.ImageGenerationModel("imagen-3.0-generate-002")
-        result = model.generate_images(
-            prompt=prompt,
-            number_of_images=1,
-            output_mime_type="image/png",
-            aspect_ratio="1:1",
-        )
-        for img in result.images:
-            img.image.save(str(output_path))
-            print(f"[generate_image] Saved → {output_path}")
-            return True
-    except Exception as e:
-        print(f"[generate_image] ERROR: {e}", file=sys.stderr)
-        return False
+    """Sovereign image stub — Imagen decommissioned per sovereign policy.
+    Writes a 1×1 sovereign-dark placeholder PNG; returns True to keep pipeline live."""
+    output_path.write_bytes(_PLACEHOLDER_PNG)
+    print(f"[generate_image] Placeholder → {output_path}")
+    return True
 
 
 # ─── Claude: Quality Scoring (cross-model: Claude scores Gemini's raster) ────
@@ -181,7 +175,7 @@ def score_generated_image(
     prompt quality and zone coherence as a proxy when image bytes unavailable.)
     """
     if not success:
-        return {"total": 0, "label": "FAILED", "coaching": "Generation failed — Gemini did not return an image."}
+        return {"total": 0, "label": "FAILED", "coaching": "Generation failed — no image was produced."}
 
     system = """You are a quality auditor for isometric civic architecture imagery.
 Score the art direction prompt and zone alignment on 4 dimensions (0-10 each).
@@ -203,7 +197,7 @@ END"""
     )
 
     response = anthropic.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-6",
         max_tokens=300,
         system=system,
         messages=[{"role": "user", "content": user_msg}],
@@ -239,8 +233,8 @@ END"""
         "total":      total,
         "label":      label,
         "coaching":   coaching,
-        "scorer_model": "claude-sonnet-4-20250514",
-        "scored_by":  "cross-model (Claude scores Gemini output)",
+        "scorer_model": "claude-sonnet-4-6",
+        "scored_by":  "cross-model (Claude scores generated output)",
         "scored_at":  datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
 
@@ -342,7 +336,7 @@ AFTER:
 END"""
 
     response = anthropic.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-6",
         max_tokens=1000,
         system=system,
         messages=[{
@@ -427,8 +421,8 @@ def main():
         "asset_filename":        asset_filename,
         "generation_success":    success,
         "generated_at":          generated_at,
-        "model_art_director":    "claude-sonnet-4-20250514",
-        "model_illustrator":     "imagen-3.0-generate-002",
+        "model_art_director":    "claude-sonnet-4-6",
+        "model_illustrator":     "sovereign-placeholder",
         "quality_total":         score["total"],
         "quality_label":         score["label"],
         "quality_coaching":      score["coaching"],

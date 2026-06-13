@@ -1,23 +1,15 @@
 #!/usr/bin/env python3
+# Authored: Albert Lane | Documented: Claude Sonnet 4.6 | 2026-06-12
 """
 SimCity Creative Engine — v2
-Upgraded from the original hourly creative engine.
 
-WHAT'S NEW IN V2:
-  - Style evolution notes injected into SVG generation prompt (learning loop)
-  - BLAKE3 content hash computed and embedded in every SVG
-  - Quality score integration (scoring happens in workflow step, not here)
-  - Provenance metadata injected into SVG output
-  - Coaching notes from previous iteration available to Claude
-  - Creative self-improvement pass on creative_engine.py itself (weekly)
+Phase 1 — Claude Haiku : reads zone state + history + evolution notes
+                          → writes narrative advancement
+Phase 2 — Claude Sonnet: reads zone + narrative + style evolution notes
+                          + previous coaching → generates isometric SVG
+Phase 3 — Write outputs : SVG with provenance, VISUAL_LOG.md, gen_state
 
-Phase 1 — Gemini 2.5 Flash : reads zone state + history + evolution notes
-                               → writes narrative advancement
-Phase 2 — Claude Sonnet    : reads zone + narrative + style evolution notes
-                               + previous coaching → generates isometric SVG
-Phase 3 — Write outputs    : SVG with provenance, VISUAL_LOG.md, gen_state
-
-Runs at :15 every hour. Private infra updates zone_state.json at :00.
+Runs at :20 every hour. Private infra updates updates/latest.json at :00.
 
 AUTHORED: Albert Lane | SovereignAudits™ | albertlane.net
 SEC Whistleblower No. 17684-273-411-436
@@ -26,20 +18,18 @@ SEC Whistleblower No. 17684-273-411-436
 import os, json, sys, re, hashlib, datetime, textwrap
 from pathlib import Path
 from anthropic import Anthropic
-from google import genai
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-ROOT               = Path(__file__).parent.parent
-ZONE_STATE         = ROOT / "zone_state.json"
+ROOT               = Path(__file__).resolve().parents[2]
+ZONE_STATE         = ROOT / "updates" / "latest.json"
 GEN_STATE          = ROOT / "generation_state.json"
 VISUAL_QUALITY     = ROOT / "visual_quality_state.json"
 SVG_DIR            = ROOT / "assets" / "svg"
 VISUAL_LOG         = ROOT / "VISUAL_LOG.md"
 GALLERY_MD         = ROOT / "gallery.md"
 
-# ── Clients ───────────────────────────────────────────────────────────────────
-claude  = Anthropic(api_key=os.environ["CLAUDE_API_KEY"])
-gemini  = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+# ── Client ────────────────────────────────────────────────────────────────────
+claude = Anthropic(api_key=os.environ["CLAUDE_API_KEY"])
 
 # ── T2 GlacierNoir palette (hard-coded — no drift ever) ───────────────────────
 T2 = {
@@ -81,15 +71,47 @@ CREATOR  = "Albert Lane | SovereignAudits™"
 SEC_REF  = "17684-273-411-436"
 LICENSE  = "SOVEREIGN IP LICENSE v1"
 
+# ── Zone key mapping from updates/latest.json display names ───────────────────
+_ZONE_KEY_MAP: dict[str, str] = {
+    "City Hall":          "city_hall",
+    "Gateway District":   "gateway_district",
+    "Intelligence Core":  "intelligence_core",
+    "Sovereign Quarters": "sovereign_quarters",
+}
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # State management
 # ─────────────────────────────────────────────────────────────────────────────
 
 def load_state() -> tuple[dict, dict]:
-    zone_state = json.loads(ZONE_STATE.read_text())
-    gen_state  = json.loads(GEN_STATE.read_text())
-    return zone_state, gen_state
+    """Read updates/latest.json + generation_state.json and return (zone_data, gen_state)."""
+    raw = json.loads(ZONE_STATE.read_text())
+
+    # Transform updates/latest.json array format into keyed dict
+    zones: dict[str, dict] = {}
+    for z in raw.get("zones", []):
+        key = _ZONE_KEY_MAP.get(z["zone"], z["zone"].lower().replace(" ", "_"))
+        zones[key] = {
+            "label":       z["zone"],
+            "layer":       z.get("layer", ""),
+            "phase":       z.get("active_phase", ""),
+            "progress":    z.get("completion", 0),
+            "status":      z.get("status", "planned"),
+            "description": z.get("description", ""),
+            "detail":      z.get("description", ""),
+        }
+
+    zone_data = {
+        "city_meta": {
+            "name":          "SimCity",
+            "tagline":       raw.get("signal", "Walls rise. The blueprint holds."),
+            "overall_phase": raw.get("momentum", "Construction"),
+        },
+        "zones": zones,
+    }
+    gen_state = json.loads(GEN_STATE.read_text())
+    return zone_data, gen_state
 
 
 def next_zone(gen_state: dict) -> str:
@@ -108,16 +130,13 @@ def load_quality_state() -> dict:
 
 
 def get_previous_coaching(zone_key: str, quality_state: dict) -> str:
-    """Get the most recent coaching note for a zone from quality scoring history."""
     zone_scores = quality_state.get("zones", {}).get(zone_key, {}).get("scores", [])
     if not zone_scores:
         return ""
-    last = zone_scores[-1]
-    return last.get("coaching", "")
+    return zone_scores[-1].get("coaching", "")
 
 
 def get_style_evolution_notes(zone_key: str, gen_state: dict) -> str:
-    """Get the evolved style vocabulary for a zone (updated weekly by style_evolution.py)."""
     evolution = gen_state.get("style_evolution", {})
     return evolution.get(zone_key, "")
 
@@ -127,7 +146,6 @@ def save_gen_state(gen_state: dict, zone_key: str, narrative_summary: str):
     gen_state["zone_index"] = (gen_state["zone_index"] + 1) % len(gen_state["zone_order"])
     gen_state["last_run"]   = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     gen_state["last_zone"]  = zone_key
-
     gen_state["history"].append({
         "iteration": gen_state["iteration"],
         "zone":      zone_key,
@@ -139,7 +157,7 @@ def save_gen_state(gen_state: dict, zone_key: str, narrative_summary: str):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Phase 1 — Gemini: narrative advancement (unchanged from v1)
+# Phase 1 — Claude Haiku: narrative advancement
 # ─────────────────────────────────────────────────────────────────────────────
 
 def advance_narrative(zone_key: str, zone_data: dict, gen_state: dict) -> str:
@@ -151,41 +169,40 @@ def advance_narrative(zone_key: str, zone_data: dict, gen_state: dict) -> str:
         for h in history
     ) or "First run — no prior history."
 
-    prompt = f"""You are the narrator for SimCity, a public civic infrastructure project.
-Write ONE paragraph (3–5 sentences) advancing the narrative for the zone below.
-This paragraph will appear in a public visual log. It is factual, civic in tone,
-and written from the perspective of construction progress — not marketing.
-
-City: {meta['name']} — {meta['tagline']}
-Phase: {meta['overall_phase']}
-
-Zone: {zone['label']} ({zone['layer']} layer)
-Current phase: {zone['phase']}
-Progress: {zone['progress']}%
-Status: {zone['status']}
-Description: {zone['description']}
-Detail: {zone['detail']}
-
-Recent history (other zones, for continuity):
-{history_text}
-
-Rules:
-- One paragraph only. No headers, no bullets, no markdown.
-- Civic voice — like a project update, not a press release.
-- Reference the progress percentage naturally if it advances the story.
-- End with something that implies the next step, not completion.
-- Never use the words "vibrant", "revolutionize", "innovative", or "seamless".
-- Be honest — don't overstate progress or fabricate milestones.
-"""
-    response = gemini.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt,
+    prompt = (
+        f"City: {meta['name']} — {meta['tagline']}\n"
+        f"Phase: {meta['overall_phase']}\n\n"
+        f"Zone: {zone['label']} ({zone['layer']} layer)\n"
+        f"Current phase: {zone['phase']}\n"
+        f"Progress: {zone['progress']}%\n"
+        f"Status: {zone['status']}\n"
+        f"Description: {zone['description']}\n"
+        f"Detail: {zone['detail']}\n\n"
+        f"Recent history:\n{history_text}\n\n"
+        "Rules:\n"
+        "- One paragraph only. No headers, no bullets, no markdown.\n"
+        "- Civic voice — like a project update, not a press release.\n"
+        "- Reference the progress percentage naturally.\n"
+        "- End with something implying the next step, not completion.\n"
+        "- Never use: vibrant, revolutionize, innovative, seamless.\n"
+        "- Be honest — don't overstate progress or fabricate milestones."
     )
-    return response.text.strip()
+
+    response = claude.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=256,
+        system=(
+            "You are the narrator for a civic infrastructure project. "
+            "Write ONE paragraph (3-5 sentences) advancing the narrative for the zone below. "
+            "Factual, civic in tone, no marketing language."
+        ),
+        messages=[{"role": "user", "content": prompt}],
+    )
+    return response.content[0].text.strip()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Phase 2 — Claude: isometric SVG (upgraded with evolution notes + coaching)
+# Phase 2 — Claude Sonnet: isometric SVG
 # ─────────────────────────────────────────────────────────────────────────────
 
 def generate_zone_svg(
@@ -200,10 +217,9 @@ def generate_zone_svg(
     vocab = ZONE_VOCAB[zone_key]
     pct   = zone["progress"]
 
-    # Construction state precision
     if pct < 40:
         construction_note = (
-            "Foundation poured. Steel skeleton rising to 2–3 floors. "
+            "Foundation poured. Steel skeleton rising to 2-3 floors. "
             "Construction crane dominant in composition. Upper floors are empty steel frames, "
             "no facade, no windows. Ground-level details show concrete forms and rebar."
         )
@@ -226,61 +242,39 @@ def generate_zone_svg(
             "Subtle ambient lighting effects — the building is alive."
         )
 
-    # Build style evolution injection (what the system has learned)
     evolution_clause = ""
     if style_evolution_notes:
-        evolution_clause = f"""
-LEARNED STYLE IMPROVEMENTS (apply these based on quality score history):
-{style_evolution_notes}
-"""
+        evolution_clause = f"\nLEARNED STYLE IMPROVEMENTS (apply these):\n{style_evolution_notes}\n"
 
-    # Build coaching injection (most recent Gemini critique)
     coaching_clause = ""
     if previous_coaching:
-        coaching_clause = f"""
-PREVIOUS ITERATION CRITIQUE (address this specific weakness):
-{previous_coaching}
-"""
+        coaching_clause = f"\nPREVIOUS ITERATION CRITIQUE (address this):\n{previous_coaching}\n"
 
-    system = f"""You are a technical SVG illustrator specialising in isometric civic architecture.
-You produce complete, valid, browser-renderable SVG — nothing else.
-No preamble. No explanation. No markdown fences. Raw SVG only, starting with <svg.
-
-ISOMETRIC GEOMETRY (enforce these exactly):
-- ViewBox: 0 0 800 520
-- Isometric projection: x-axis right-down 30°, y-axis left-down 30°, z-axis straight up
-- Horizontal surfaces: rhombus/parallelogram shapes only (never rectangles viewed head-on)
-- Top face: {T2['ice']} at 15% opacity layered over {T2['blue']}
-- Left face (shadow): {T2['mid']}
-- Right face (shadow): {T2['dark']}
-- Background: solid {T2['bg']} rect covering full 800×520 viewBox
-- Primary accent: {T2['blue']}
-- Window/light colour: {T2['ice']} at varying opacity (50–90%)
-- Grid lines: {T2['line']} at 20% opacity
-- Amber accent: {T2['amber']} — MAXIMUM ONE element in the entire composition
-
-STRUCTURE VOCABULARY FOR THIS ZONE:
-{vocab['archetype']}
-
-MOOD: {vocab['mood']}
-LIGHTING: {vocab['lighting']}
-
-CONSTRUCTION STATE (iteration {iteration}, {pct}% complete):
-{construction_note}
-
-NARRATIVE CONTEXT (use for compositional emphasis only — do not illustrate literally):
-{narrative[:200]}
-{evolution_clause}{coaching_clause}
-QUALITY STANDARDS:
-- Every shape must be intentional — no filler rectangles
-- Window grids should show individual panes, not single rectangles
-- Use at least 3 distinct depth layers in the composition
-- The construction state must be immediately readable to a viewer
-
-Produce a single complete <svg> element. Portfolio quality."""
+    system = (
+        "You are a technical SVG illustrator specialising in isometric civic architecture. "
+        "You produce complete, valid, browser-renderable SVG — nothing else. "
+        "No preamble. No explanation. No markdown fences. Raw SVG only, starting with <svg.\n\n"
+        f"ISOMETRIC GEOMETRY (enforce exactly):\n"
+        f"- ViewBox: 0 0 800 520\n"
+        f"- Isometric projection: x-axis right-down 30°, y-axis left-down 30°, z-axis straight up\n"
+        f"- Horizontal surfaces: rhombus/parallelogram shapes only\n"
+        f"- Background: solid {T2['bg']} rect covering full 800x520 viewBox\n"
+        f"- Primary accent: {T2['blue']}\n"
+        f"- Window/light colour: {T2['ice']} at varying opacity (50-90%)\n"
+        f"- Grid lines: {T2['line']} at 20% opacity\n"
+        f"- Amber accent: {T2['amber']} — MAXIMUM ONE element\n\n"
+        f"STRUCTURE VOCABULARY:\n{vocab['archetype']}\n\n"
+        f"MOOD: {vocab['mood']}\n"
+        f"LIGHTING: {vocab['lighting']}\n\n"
+        f"CONSTRUCTION STATE (iteration {iteration}, {pct}% complete):\n"
+        f"{construction_note}\n\n"
+        f"NARRATIVE CONTEXT:\n{narrative[:200]}\n"
+        f"{evolution_clause}{coaching_clause}\n"
+        "Produce a single complete <svg> element. Portfolio quality."
+    )
 
     response = claude.messages.create(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-6",
         max_tokens=4096,
         system=system,
         messages=[{
@@ -313,7 +307,6 @@ def _blake3_eq(data: bytes) -> str:
 
 
 def inject_svg_provenance(svg: str, zone_key: str, iteration: int) -> str:
-    """Inject safe public attribution into SVG. No private keys embedded."""
     content_hash = _blake3_eq(svg.encode())
     tag = content_hash[:8]
 
@@ -337,14 +330,12 @@ def inject_svg_provenance(svg: str, zone_key: str, iteration: int) -> str:
         f'sec="{SEC_REF}" zone="{zone_key}" iter="{iteration}" -->'
     )
 
-    # Insert metadata after opening <svg...> tag
     if '<metadata>' not in svg:
         match = re.search(r'<svg[^>]*>', svg)
         if match:
             pos = match.end()
             svg = svg[:pos] + metadata_block + svg[pos:]
 
-    # Insert provenance comment before </svg>
     svg = svg.rstrip()
     if svg.endswith('</svg>'):
         svg = svg[:-6] + '\n' + prov_comment + '\n</svg>'
@@ -353,16 +344,12 @@ def inject_svg_provenance(svg: str, zone_key: str, iteration: int) -> str:
 
 
 def write_svg(zone_key: str, svg: str, iteration: int) -> str:
-    """Write current + versioned snapshot. Returns the path of the current file."""
     SVG_DIR.mkdir(parents=True, exist_ok=True)
-
     svg_with_prov = inject_svg_provenance(svg, zone_key, iteration)
-
     current_path  = SVG_DIR / f"{zone_key}.svg"
     snapshot_path = SVG_DIR / f"{zone_key}_i{iteration:04d}.svg"
     current_path.write_text(svg_with_prov)
     snapshot_path.write_text(svg_with_prov)
-
     content_hash = _blake3_eq(svg.encode())
     print(f"[write_svg] {current_path.name} hash={content_hash[:12]}... iter={iteration}")
     return str(current_path)
@@ -380,7 +367,6 @@ def append_visual_log(
     zone    = zone_data["zones"][zone_key]
     repo    = os.environ.get("GITHUB_REPOSITORY", "Albert-lane-org/SimCity")
     svg_url = f"https://raw.githubusercontent.com/{repo}/main/assets/svg/{zone_key}.svg"
-
     quality_line = f"**Quality:** {quality_total}/40 ({quality_label})" if quality_total else ""
 
     entry = textwrap.dedent(f"""
@@ -408,11 +394,10 @@ def append_visual_log(
 
 
 def update_gallery(zone_data: dict, gen_state: dict, quality_state: dict):
-    """Regenerate gallery.md from current best-per-zone assets."""
     repo  = os.environ.get("GITHUB_REPOSITORY", "Albert-lane-org/SimCity")
     now   = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     meta  = zone_data.get("city_meta", {})
-    iteration = gen_state.get("iteration", 0)
+    iteration = gen_state.get("iteration", 0) + 1
 
     lines = [
         "# SimCity — Public Gallery",
@@ -466,10 +451,7 @@ def update_gallery(zone_data: dict, gen_state: dict, quality_state: dict):
         lines.append("---")
         lines.append("")
 
-    lines += [
-        f"*Updated: {now} &nbsp;·&nbsp; {LICENSE}*",
-    ]
-
+    lines += [f"*Updated: {now} &nbsp;·&nbsp; {LICENSE}*"]
     GALLERY_MD.write_text("\n".join(lines))
     print(f"[update_gallery] gallery.md updated — iteration {iteration}")
 
@@ -488,8 +470,7 @@ def main():
     iteration            = gen_state["iteration"] + 1
     zone_label           = zone_data["zones"][zone_key]["label"]
 
-    # Load feedback from previous quality cycle
-    style_notes      = get_style_evolution_notes(zone_key, gen_state)
+    style_notes       = get_style_evolution_notes(zone_key, gen_state)
     previous_coaching = get_previous_coaching(zone_key, quality_state)
 
     print(f"[main] Zone: {zone_label} | Iteration: {iteration}")
@@ -498,12 +479,10 @@ def main():
     if previous_coaching:
         print(f"[main] Previous coaching: {previous_coaching[:80]}...")
 
-    # Phase 1: Gemini narrative
-    print("[main] Phase 1 — Gemini narrative...")
+    print("[main] Phase 1 — Claude Haiku narrative...")
     narrative = advance_narrative(zone_key, zone_data, gen_state)
 
-    # Phase 2: Claude SVG (with evolution notes + coaching)
-    print("[main] Phase 2 — Claude SVG generation...")
+    print("[main] Phase 2 — Claude Sonnet SVG generation...")
     svg = generate_zone_svg(
         zone_key, zone_data, narrative, iteration,
         style_evolution_notes=style_notes,
@@ -511,13 +490,11 @@ def main():
     )
     print(f"[main] SVG: {len(svg)} chars, valid={svg.startswith('<svg')}")
 
-    # Phase 3: Write outputs
     svg_path = write_svg(zone_key, svg, iteration)
     append_visual_log(zone_key, zone_data, narrative, iteration, timestamp)
     update_gallery(zone_data, gen_state, quality_state)
     save_gen_state(gen_state, zone_key, narrative[:120])
 
-    # Signal for workflow steps (quality_scorer runs next)
     out = os.environ.get("GITHUB_OUTPUT", "")
     if out:
         zone = zone_data["zones"][zone_key]

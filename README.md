@@ -1,61 +1,59 @@
-<!--
-  Authored: Albert Lane | Rendered: Claude Sonnet 4.6 | 2026-06-10
-  Auto-generated. Direct edits will be overwritten on the next hourly cycle.
-  No proprietary implementation details are present in this file.
--->
+        <!--
+          Authored: Albert Lane | Rendered: Claude Sonnet 4.6 | 2026-06-11 17:22 UTC
+          Auto-generated every hour. Direct edits will be overwritten.
+          No proprietary implementation details are present in this file.
+        -->
 
-# SimCity
+        # SimCity
 
-> *Walls rise. The blueprint holds.*
+        > *Walls rise. The blueprint holds.*
 
-**Breaking Ground** &nbsp;·&nbsp; Iteration 0 &nbsp;·&nbsp; ● Steady
+        **Breaking Ground** &nbsp;·&nbsp; Iteration 1 &nbsp;·&nbsp; ● Steady
 
----
+        ---
 
-## The City Right Now
+        ## The City Right Now
 
-```
-  ·  ·  ·  ·  ·  ·  ·  ·  ·
-      [ SITE CLEARED ]
-  ·  ·  ·  ·  ·  ·  ·  ·  ·
-```
+        ```
+          ·  ·  ·  ·  ·  ·  ·  ·  ·  
+      [ SITE CLEARED ]        
+  ·  ·  ·  ·  ·  ·  ·  ·  ·  
+        ```
 
-The site is cleared. Surveyors have been through.
-The plan exists in blueprint form — clean lines, honest ambitions.
-What follows is construction.
+        The site is cleared. Surveyors have been through. The plan exists in blueprint form — clean lines, honest ambitions. What follows is construction.
 
----
+        ---
 
-## Zone Status
+        ## Zone Status
 
-| Zone | Layer | Phase | Progress | Status |
+        | Zone | Layer | Phase | Progress | Status |
 |------|-------|-------|----------|--------|
 | **City Hall** | navigation | Foundation | `██████████████` 100% | ✦ operational |
-| **Gateway District** | infrastructure | Integration | `█████████░░░░░` 60% | ◈ building |
+| **Gateway District** | infrastructure | Integration | `████████░░░░░░` 60% | ◈ building |
 | **Intelligence Core** | data | Integration | `██████████░░░░` 75% | ◈ building |
-| **Sovereign Quarters** | interface | Integration | `████████░░░░░░` 55% | ◈ building |
+| **Sovereign Quarters** | interface | Integration | `███████░░░░░░░` 55% | ◈ building |
 
-&nbsp;
+        &nbsp;
 
-| Metric | Count |
-|--------|-------|
-| Zones under construction | 3 |
-| Zones operational | 1 |
-| Phases complete | 4 |
-| Phases in progress | 3 |
+        | Metric | Count |
+        |--------|-------|
+        | Zones under construction | 3 |
+        | Zones operational | 1 |
+        | Phases complete | 4 |
+        | Phases in progress | 3 |
 
----
+        ---
 
-## Open Invitation
+        ## Open Invitation
 
 SimCity is the public face of a civic infrastructure project.
 The infrastructure is being built. The design needs to match its ambition.
 
 **We are specifically looking for:**
 
-- **Interface Architects** — People who believe software should feel like a place you want to be in.
 - **Systems Typographers** — Designers who understand that data has a visual grammar.
 - **Civic UX Designers** — People who've worked on public-facing digital infrastructure and hated how bad it was.
+- **Motion Designers** — Animation that communicates state, not just decoration.
 
 This is not a job listing. It is an invitation to be present at the start
 of something that has not been built before — a sovereign, open, civic-first
@@ -64,64 +62,65 @@ that actually works for the people using it.
 
 **Contact:** `lane.albert@pm.me`
 
----
 
-## What SimCity Is
+        ---
 
-SimCity is the public creative window into the **Albert Lane Digital Estate** —
-a sovereign, open, civic-first software stack replacing broken public and private
-infrastructure with something that actually works.
+        ## What SimCity Is
 
-The underlying infrastructure is private. SimCity is not.
+        SimCity is the public creative window into the **Albert Lane Digital Estate** —
+        a sovereign, open, civic-first software stack replacing broken public and private
+        infrastructure with something that actually works.
 
-SimCity publishes **what is being built** — direction, character, and design
-language — without exposing implementation detail. It exists to attract
-collaborators, especially designers, who should be present from the start.
+        The underlying infrastructure is private. SimCity is not.
 
-This README updates automatically every hour. Each iteration carries forward
-the accumulated language, visual motifs, and narrative arc of all previous
-iterations. The city grows because someone is building it.
+        SimCity publishes **what is being built** — direction, character, and design
+        language — without exposing implementation detail. It exists to attract
+        collaborators, especially designers, who should be present from the start.
 
----
+        This README updates automatically every hour. Each iteration carries forward
+        the accumulated language, visual motifs, and narrative arc of all previous
+        iterations. The city grows because someone is building it.
 
-## System Architecture (Public Layer)
+        ---
 
-```
-┌────────────────────────────────────────────────────────┐
-│              Albert Lane Digital Estate                 │
-│                                                         │
-│  ┌─────────────┐  ┌──────────────┐  ┌─────────────┐  │
-│  │   Gateway   │  │ Intelligence │  │  Sovereign  │  │
-│  │   District  │  │     Core     │  │   Quarters  │  │
-│  └──────┬──────┘  └──────┬───────┘  └──────┬──────┘  │
-│         └────────────────┼──────────────────┘          │
-│                     ┌────┴─────┐                        │
-│                     │ City Hall│                        │
-│                     └──────────┘                        │
-└────────────────────────────────────────────────────────┘
-                  ↑ SimCity (this repo — public)
-```
+        ## System Architecture (Public Layer)
 
----
+        ```
+        ┌────────────────────────────────────────────────────────┐
+        │              Albert Lane Digital Estate                 │
+        │                                                         │
+        │  ┌─────────────┐  ┌──────────────┐  ┌─────────────┐  │
+        │  │   Gateway   │  │ Intelligence │  │  Sovereign  │  │
+        │  │   District  │  │     Core     │  │   Quarters  │  │
+        │  └──────┬──────┘  └──────┬───────┘  └──────┬──────┘  │
+        │         └────────────────┼──────────────────┘          │
+        │                     ┌────┴─────┐                        │
+        │                     │ City Hall│                        │
+        │                     └──────────┘                        │
+        └────────────────────────────────────────────────────────┘
+                          ↑ SimCity (this repo — public)
+        ```
 
-## How This Works
+        ---
 
-```
-Private infrastructure  →  sanitized dispatch  →  SimCity
-   (hourly at :00)             (no secrets)        (public)
-                                                      ↓
-                                            creative engine at :15
-                                                      ↓
-                                            README.md rewritten
-                                                      ↓
-                                            narrative arc advances
-```
+        ## How This Works
 
-The creative state accumulates across runs. Each cycle the engine
-reads the previous state, adds new motifs, advances the narrative,
-and renders a README that is genuinely different from the last one.
+        ```
+        Private infrastructure  →  sanitized dispatch  →  SimCity
+           (hourly at :00)             (no secrets)        (public)
+                                                              ↓
+                                                    creative engine at :15
+                                                              ↓
+                                                    README.md rewritten
+                                                              ↓
+                                                    narrative arc advances
+        ```
 
----
+        The creative state accumulates across runs. Each cycle the engine
+        reads the previous state, adds new motifs, advances the narrative,
+        and renders a README that is genuinely different from the last one.
 
-*Last updated: 2026-06-10 00:00 UTC &nbsp;·&nbsp; All IP belongs to Albert Lane. See [LICENSE.md](LICENSE.md).*
-*Contact: `lane.albert@pm.me`*
+        ---
+
+        *Last updated: 2026-06-11 17:22 UTC &nbsp;·&nbsp; All IP belongs to Albert Lane. See [LICENSE.md](LICENSE.md).*
+        *Contact: `lane.albert@pm.me`*

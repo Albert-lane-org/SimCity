@@ -1,0 +1,19 @@
+{
+  "iteration": 0,
+  "zone_index": 0,
+  "zone_order": [
+    "city_hall",
+    "gateway_district",
+    "intelligence_core",
+    "sovereign_quarters"
+  ],
+  "last_run": null,
+  "last_zone": null,
+  "history": [],
+  "style_evolution": {
+    "city_hall": "",
+    "gateway_district": "",
+    "intelligence_core": "",
+    "sovereign_quarters": ""
+  }
+}
