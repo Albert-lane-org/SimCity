@@ -23,7 +23,6 @@ import os, json, sys, hashlib, datetime, re
 from pathlib import Path
 
 from anthropic import Anthropic
-import google.generativeai as genai
 
 # ─── Constants ────────────────────────────────────────────────────────────────
 LEDGER_DIR        = Path("design_ledger/entries")
@@ -57,7 +56,6 @@ Avoid: fantasy, organic forms unmoored from civic context,
 
 # ─── Clients ──────────────────────────────────────────────────────────────────
 anthropic = Anthropic(api_key=os.environ["CLAUDE_API_KEY"])
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -147,24 +145,13 @@ Rules:
     return response.content[0].text.strip()
 
 
-# ─── Gemini: Illustration ─────────────────────────────────────────────────────
+# ─── Illustration (image generation removed — raster pipeline pending) ────────
 
 def generate_image(prompt: str, output_path: Path) -> bool:
-    try:
-        model  = genai.ImageGenerationModel("imagen-3.0-generate-002")
-        result = model.generate_images(
-            prompt=prompt,
-            number_of_images=1,
-            output_mime_type="image/png",
-            aspect_ratio="1:1",
-        )
-        for img in result.images:
-            img.image.save(str(output_path))
-            print(f"[generate_image] Saved → {output_path}")
-            return True
-    except Exception as e:
-        print(f"[generate_image] ERROR: {e}", file=sys.stderr)
-        return False
+    # Image generation is not available in this pipeline configuration.
+    # Art direction prompts are recorded in the ledger for offline rendering.
+    print(f"[generate_image] Skipped — no image backend configured. Prompt logged.")
+    return False
 
 
 # ─── Claude: Quality Scoring (cross-model: Claude scores Gemini's raster) ────
@@ -428,7 +415,7 @@ def main():
         "generation_success":    success,
         "generated_at":          generated_at,
         "model_art_director":    "claude-sonnet-4-20250514",
-        "model_illustrator":     "imagen-3.0-generate-002",
+        "model_illustrator":     "none (image generation pending)",
         "quality_total":         score["total"],
         "quality_label":         score["label"],
         "quality_coaching":      score["coaching"],
