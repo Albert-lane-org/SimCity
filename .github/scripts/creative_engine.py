@@ -20,7 +20,7 @@ from pathlib import Path
 from anthropic import Anthropic
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-ROOT               = Path(__file__).resolve().parents[2]
+ROOT               = Path(__file__).parent.parent
 ZONE_STATE         = ROOT / "updates" / "latest.json"
 GEN_STATE          = ROOT / "generation_state.json"
 VISUAL_QUALITY     = ROOT / "visual_quality_state.json"
@@ -397,7 +397,7 @@ def update_gallery(zone_data: dict, gen_state: dict, quality_state: dict):
     repo  = os.environ.get("GITHUB_REPOSITORY", "Albert-lane-org/SimCity")
     now   = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     meta  = zone_data.get("city_meta", {})
-    iteration = gen_state.get("iteration", 0) + 1
+    iteration = gen_state.get("iteration", 0)
 
     lines = [
         "# SimCity — Public Gallery",
