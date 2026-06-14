@@ -54,9 +54,9 @@ print('Creative state reset to iteration 0')
           git config user.name "Claude"
           git add README.md creative-state.json
           if ! git diff --cached --quiet; then
-            git commit -m "chore: creative update $(date -u +%Y-%m-%dT%H:%M:%SZ)
-
-Co-authored-by: Claude Sonnet 4.6 <claude@anthropic.com>"
+            git commit \
+              -m "chore: creative update $(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+              -m "Co-authored-by: Claude Sonnet 4.6 <claude@anthropic.com>"
             git push origin main || echo "[creative-update] Push blocked (branch protection active — state queued for next merge)" >&2
             echo "SimCity README updated"
           else
