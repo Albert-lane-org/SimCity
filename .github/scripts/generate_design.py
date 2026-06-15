@@ -23,7 +23,6 @@ import os, json, sys, hashlib, datetime, re
 from pathlib import Path
 
 from anthropic import Anthropic
-import base64
 
 # ─── Constants ────────────────────────────────────────────────────────────────
 LEDGER_DIR        = Path("design_ledger/entries")
@@ -57,11 +56,6 @@ Avoid: fantasy, organic forms unmoored from civic context,
 
 # ─── Clients ──────────────────────────────────────────────────────────────────
 anthropic = Anthropic(api_key=os.environ["CLAUDE_API_KEY"])
-
-_PLACEHOLDER_PNG = base64.b64decode(
-    b"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1Pe"
-    b"AAAADElEQVR4nGOQs4oHAAExALh6BwjnAAAAAElFTkSuQmCC"
-)
 
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -136,7 +130,7 @@ Rules:
 - Never fabricate progress milestones — stay honest to zone_state.json."""
 
     response = anthropic.messages.create(
-        model="claude-sonnet-4-6",
+        model="claude-sonnet-4-20250514",
         max_tokens=400,
         system=system,
         messages=[{
@@ -151,14 +145,13 @@ Rules:
     return response.content[0].text.strip()
 
 
-# ─── Gemini: Illustration ─────────────────────────────────────────────────────
+# ─── Illustration (image generation removed — raster pipeline pending) ────────
 
 def generate_image(prompt: str, output_path: Path) -> bool:
-    """Sovereign image stub — Imagen decommissioned per sovereign policy.
-    Writes a 1×1 sovereign-dark placeholder PNG; returns True to keep pipeline live."""
-    output_path.write_bytes(_PLACEHOLDER_PNG)
-    print(f"[generate_image] Placeholder → {output_path}")
-    return True
+    # Image generation is not available in this pipeline configuration.
+    # Art direction prompts are recorded in the ledger for offline rendering.
+    print(f"[generate_image] Skipped — no image backend configured. Prompt logged.")
+    return False
 
 
 # ─── Claude: Quality Scoring (cross-model: Claude scores Gemini's raster) ────
@@ -175,7 +168,7 @@ def score_generated_image(
     prompt quality and zone coherence as a proxy when image bytes unavailable.)
     """
     if not success:
-        return {"total": 0, "label": "FAILED", "coaching": "Generation failed — no image was produced."}
+        return {"total": 0, "label": "FAILED", "coaching": "Generation failed — Gemini did not return an image."}
 
     system = """You are a quality auditor for isometric civic architecture imagery.
 Score the art direction prompt and zone alignment on 4 dimensions (0-10 each).
@@ -197,7 +190,7 @@ END"""
     )
 
     response = anthropic.messages.create(
-        model="claude-sonnet-4-6",
+        model="claude-sonnet-4-20250514",
         max_tokens=300,
         system=system,
         messages=[{"role": "user", "content": user_msg}],
@@ -233,8 +226,8 @@ END"""
         "total":      total,
         "label":      label,
         "coaching":   coaching,
-        "scorer_model": "claude-sonnet-4-6",
-        "scored_by":  "cross-model (Claude scores generated output)",
+        "scorer_model": "claude-sonnet-4-20250514",
+        "scored_by":  "cross-model (Claude scores Gemini output)",
         "scored_at":  datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
     }
 
@@ -336,7 +329,7 @@ AFTER:
 END"""
 
     response = anthropic.messages.create(
-        model="claude-sonnet-4-6",
+        model="claude-sonnet-4-20250514",
         max_tokens=1000,
         system=system,
         messages=[{
@@ -421,8 +414,8 @@ def main():
         "asset_filename":        asset_filename,
         "generation_success":    success,
         "generated_at":          generated_at,
-        "model_art_director":    "claude-sonnet-4-6",
-        "model_illustrator":     "sovereign-placeholder",
+        "model_art_director":    "claude-sonnet-4-20250514",
+        "model_illustrator":     "none (image generation pending)",
         "quality_total":         score["total"],
         "quality_label":         score["label"],
         "quality_coaching":      score["coaching"],
