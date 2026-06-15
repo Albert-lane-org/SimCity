@@ -20,7 +20,9 @@ from pathlib import Path
 from anthropic import Anthropic
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
-ROOT               = Path(__file__).parent.parent
+# Correct repo root: this file is at .github/scripts/creative_engine.py
+# so parents[2] is the repo root, not parents[1] (.github/)
+ROOT               = Path(__file__).resolve().parents[2]
 ZONE_STATE         = ROOT / "updates" / "latest.json"
 GEN_STATE          = ROOT / "generation_state.json"
 VISUAL_QUALITY     = ROOT / "visual_quality_state.json"
@@ -28,8 +30,8 @@ SVG_DIR            = ROOT / "assets" / "svg"
 VISUAL_LOG         = ROOT / "VISUAL_LOG.md"
 GALLERY_MD         = ROOT / "gallery.md"
 
-# ── Client ────────────────────────────────────────────────────────────────────
-claude = Anthropic(api_key=os.environ["CLAUDE_API_KEY"])
+# ── Client (initialized lazily after key check) ───────────────────────────────
+claude = Anthropic(api_key=os.environ.get("CLAUDE_API_KEY", ""))
 
 # ── T2 GlacierNoir palette (hard-coded — no drift ever) ───────────────────────
 T2 = {
@@ -110,7 +112,24 @@ def load_state() -> tuple[dict, dict]:
         },
         "zones": zones,
     }
-    gen_state = json.loads(GEN_STATE.read_text())
+
+    if GEN_STATE.exists():
+        gen_state = json.loads(GEN_STATE.read_text())
+    else:
+        gen_state = {
+            "iteration": 0,
+            "zone_index": 0,
+            "zone_order": ["city_hall", "gateway_district", "intelligence_core", "sovereign_quarters"],
+            "last_run": None,
+            "last_zone": None,
+            "history": [],
+            "style_evolution": {
+                "city_hall": "",
+                "gateway_district": "",
+                "intelligence_core": "",
+                "sovereign_quarters": "",
+            },
+        }
     return zone_data, gen_state
 
 
@@ -463,6 +482,11 @@ def update_gallery(zone_data: dict, gen_state: dict, quality_state: dict):
 def main():
     timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     print(f"[main] Creative engine v2 — {timestamp}")
+
+    # Graceful skip when API key is not yet configured
+    if not os.environ.get("CLAUDE_API_KEY", ""):
+        print("[main] CLAUDE_API_KEY not configured — skipping this run")
+        sys.exit(0)
 
     zone_data, gen_state = load_state()
     quality_state        = load_quality_state()
