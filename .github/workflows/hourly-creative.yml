@@ -16,7 +16,8 @@ on:
         default: ''
 
 permissions:
-  contents: read
+  contents: write
+  issues:   write
 
 jobs:
   run-creative-engine:
