@@ -27,9 +27,7 @@ on:
         default: "false"
 
 permissions:
-  contents: write
-  pull-requests: read
-  issues: write
+  contents: read
 
 jobs:
   rebase-prs:
