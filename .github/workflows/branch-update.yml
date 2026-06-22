@@ -28,8 +28,7 @@ on:
 
 permissions:
   contents: write
-  pull-requests: read
-  issues: write
+  issues:   write
 
 jobs:
   rebase-prs:
