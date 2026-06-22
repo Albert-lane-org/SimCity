@@ -308,7 +308,7 @@ def score_latest_output(
             f.write(f"quality_label={record['label']}\n")
             f.write(f"quality_coaching={record['coaching'][:200]}\n")
             streaks = zones_needing_autonomous_request(state)
-            f.write(f"needs_regen={'true' if streaks else 'false'}\n")
+            f.write(f"needs_regen={'true' if zone_key in streaks else 'false'}\n")
             f.write(f"streaks_zones={','.join(streaks)}\n")
 
     return record
