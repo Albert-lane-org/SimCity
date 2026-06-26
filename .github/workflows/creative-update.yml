@@ -57,7 +57,9 @@ print('Creative state reset to iteration 0')
             git commit \
               -m "chore: creative update $(date -u +%Y-%m-%dT%H:%M:%SZ)" \
               -m "Co-authored-by: Claude Sonnet 4.6 <claude@anthropic.com>"
-            git push origin main || echo "[creative-update] Push blocked (branch protection active — state queued for next merge)" >&2
+            git pull --rebase origin main || true
+            git push origin main \
+              || { echo "[creative-update] Push failed — check branch protection or token permissions" >&2; exit 1; }
             echo "SimCity README updated"
           else
             echo "No changes this cycle"
