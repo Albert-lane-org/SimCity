@@ -21,6 +21,36 @@ Cargo.lock
 .env
 .env.*
 *.env.local
+.env.vault
+secrets.yml
+secrets.json
+*_secret*
+*_private*
+vault.json
+
+# Credentials / keys
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+*.asc
+.gnupg/
+
+# IDE / editor state
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Coverage and test artifacts
+.coverage
+htmlcov/
+.tox/
+junit*.xml
 
 # Logs
 *.log
@@ -28,3 +58,13 @@ Cargo.lock
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Build outputs
+*.wasm
+build/
+
+# Dependency caches
+.npm/
+.yarn/cache/
+.pnp.*

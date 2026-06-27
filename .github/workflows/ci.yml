@@ -40,6 +40,32 @@ jobs:
             fi
           done
 
+      - name: Validate ledger files
+        run: |
+          for f in ledger/index.json; do
+            if [ -f "$f" ]; then
+              python3 -c "import json; json.load(open('$f'))" \
+                && echo "[ok] $f" \
+                || { echo "[fail] $f: invalid JSON" >&2; exit 1; }
+            fi
+          done
+          if [ -f ledger/chain.jsonl ]; then
+            python3 - <<'PYEOF'
+          import json, sys
+          with open("ledger/chain.jsonl") as f:
+              for i, line in enumerate(f, 1):
+                  line = line.strip()
+                  if not line:
+                      continue
+                  try:
+                      json.loads(line)
+                  except json.JSONDecodeError as e:
+                      print(f"[fail] ledger/chain.jsonl line {i}: {e}", file=sys.stderr)
+                      sys.exit(1)
+          print("[ok] ledger/chain.jsonl")
+          PYEOF
+          fi
+
       - name: Verify no Gemini imports in scripts
         run: |
           if grep -r --include='*.py' 'google.genai\|google-genai\|GEMINI_API_KEY' \
