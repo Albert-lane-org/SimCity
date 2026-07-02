@@ -1,0 +1,22 @@
+# Authored: Albert Lane | 2026-07-02
+* text=auto eol=lf
+*.py    text eol=lf
+*.json  text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.md    text eol=lf
+*.xml   text eol=lf
+*.html  text eol=lf
+*.css   text eol=lf
+*.sh    text eol=lf
+*.txt   text eol=lf
+*.svg   text eol=lf
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.wasm  binary
+*.zip   binary
+*.tar   binary
+*.gz    binary
