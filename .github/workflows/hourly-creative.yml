@@ -1,8 +1,9 @@
 # Authored: Albert Lane | Documented: Claude Sonnet 4.6 | 2026-06-12
 name: Hourly Creative Engine
 
-# Fires at :20 every hour — after creative-update.yml (:15) and simcity-dispatch (:00).
-# Gemini permanently removed (Directive 5). Claude Haiku handles narrative + scoring.
+# Fires at :20 every hour. Private infra updates updates/latest.json at :00.
+# Also fires on daily-routine and claude-api-routine dispatches.
+# creative-update.yml (malicious) was purged 2026-07-01 — this is the sole creative workflow.
 # AUTHORED: Albert Lane | SovereignAudits™ | albertlane.net
 # SEC Whistleblower No. 17684-273-411-436
 on:
@@ -14,6 +15,8 @@ on:
         description: 'Force a specific zone (city_hall|gateway_district|intelligence_core|sovereign_quarters)'
         required: false
         default: ''
+  repository_dispatch:
+    types: [daily-routine, claude-api-routine]
 
 permissions:
   contents: write
@@ -38,7 +41,7 @@ jobs:
       - name: Install dependencies
         run: pip install anthropic --quiet
 
-      - name: Run creative engine
+      - name: Run creative engine v3
         id: engine
         env:
           CLAUDE_API_KEY:    ${{ secrets.CLAUDE_API_KEY }}
@@ -65,11 +68,12 @@ jobs:
       - name: Commit outputs
         run: |
           git config user.email "creative-engine@sovereignaudits.bot"
-          git config user.name  "SimCity Creative Engine v2"
+          git config user.name  "SimCity Creative Engine v3"
           git add \
             assets/svg/ \
             VISUAL_LOG.md \
             gallery.md \
+            README.md \
             generation_state.json \
             visual_quality_state.json \
             ASSETS_FINGERPRINT.json \

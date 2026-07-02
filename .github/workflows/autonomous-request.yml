@@ -1,13 +1,13 @@
 # Authored: Albert Lane | Documented: Claude Sonnet 4.6 | 2026-06-12
 name: Autonomous Regen Request
 
-# Daily at 08:00 UTC. Scans quality state and autonomously creates design-request
+# Daily at 20:00 UTC. Scans quality state and autonomously creates design-request
 # issues for zones with sustained below-threshold scores.
 # AUTHORED: Albert Lane | SovereignAudits™ | albertlane.net
 # SEC Whistleblower No. 17684-273-411-436
 on:
   schedule:
-    - cron: '0 8 * * *'
+    - cron: '0 20 * * *'
   workflow_dispatch:
     inputs:
       force_zone:
@@ -147,7 +147,7 @@ jobs:
                   `To dismiss: close this issue.`,
                   ``,
                   `---`,
-                  `*Autonomous request by SimCity Creative Engine*`,
+                  `*Autonomous request by SimCity Creative Engine v3*`,
                   `*Albert Lane | SovereignAudits™ | SEC Ref: 17684-273-411-436*`,
                 ].join("\n"),
               });

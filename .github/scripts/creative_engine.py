@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 # Authored: Albert Lane | Documented: Claude Sonnet 4.6 | 2026-06-12
 """
-SimCity Creative Engine — v2
+SimCity Creative Engine — v3
 
-Phase 1 — Claude Haiku : reads zone state + history + evolution notes
+Phase 1 — Claude Haiku  : reads zone state + history + evolution notes
                           → writes narrative advancement
-Phase 2 — Claude Sonnet: reads zone + narrative + style evolution notes
+Phase 2 — Claude Sonnet : reads zone + narrative + style evolution notes
                           + previous coaching → generates isometric SVG
+                          Model: claude-sonnet-5 | Budget: 8192 tokens
 Phase 3 — Write outputs : SVG with provenance, VISUAL_LOG.md, gen_state
+Phase 4 — Style synth   : Claude Haiku synthesizes actionable style notes
+                          from recent quality coaching → stored in gen_state
+Phase 5 — README update : writes README.md with latest SVG + 2x2 city grid
 
 Runs at :20 every hour. Private infra updates updates/latest.json at :00.
 
@@ -19,9 +23,7 @@ import os, json, sys, re, hashlib, datetime, textwrap
 from pathlib import Path
 from anthropic import Anthropic
 
-# ── Paths ─────────────────────────────────────────────────────────────────────
-# Correct repo root: this file is at .github/scripts/creative_engine.py
-# so parents[2] is the repo root, not parents[1] (.github/)
+# ── Paths ────────────────────────────────────────────────────────────────────────────────
 ROOT               = Path(__file__).resolve().parents[2]
 ZONE_STATE         = ROOT / "updates" / "latest.json"
 GEN_STATE          = ROOT / "generation_state.json"
@@ -29,11 +31,15 @@ VISUAL_QUALITY     = ROOT / "visual_quality_state.json"
 SVG_DIR            = ROOT / "assets" / "svg"
 VISUAL_LOG         = ROOT / "VISUAL_LOG.md"
 GALLERY_MD         = ROOT / "gallery.md"
+README_MD          = ROOT / "README.md"
 
-# ── Client (initialized lazily after key check) ───────────────────────────────
+# ── Client ────────────────────────────────────────────────────────────────────────────────
+CLAUDE_SVG_MODEL   = "claude-sonnet-5"
+CLAUDE_HAIKU_MODEL = "claude-haiku-4-5-20251001"
+
 claude = Anthropic(api_key=os.environ.get("CLAUDE_API_KEY", ""))
 
-# ── T2 GlacierNoir palette (hard-coded — no drift ever) ───────────────────────
+# ── T2 GlacierNoir palette ───────────────────────────────────────────────────────────────
 T2 = {
     "bg":    "#04070E",
     "blue":  "#3B82F6",
@@ -44,36 +50,39 @@ T2 = {
     "amber": "#B8621A",
 }
 
-# ── Zone visual vocabulary ─────────────────────────────────────────────────────
+# ── Zone visual vocabulary ─────────────────────────────────────────────────────────────
 ZONE_VOCAB = {
     "city_hall": {
-        "archetype": "imposing civic hall — symmetrical facade, central clock tower, wide entrance steps, two flanking wings",
+        "archetype": "imposing civic hall — symmetrical facade, central clock tower with clock face detail, wide entrance steps with railings, two flanking wings with window rows, civic flag at apex",
         "mood": "authority, permanence, civic gravity",
         "lighting": "overhead, casting short sharp shadows down-right",
+        "key_elements": "clock tower (dominant vertical), entrance steps (wide parallelogram), window grid (3-4 floors visible), cornice detail, flag pole",
     },
     "gateway_district": {
-        "archetype": "transit hub — elevated walkways, converging rail lines, arched connectors, signal towers",
+        "archetype": "transit hub — elevated walkways as parallelograms, converging rail lines with sleepers, arched connector bridges, signal towers with light indicators, platform canopies",
         "mood": "motion, connection, infrastructure in use",
-        "lighting": "ambient dusk, blue-tinted, long shadows",
+        "lighting": "ambient dusk, blue-tinted, long shadows cast left",
+        "key_elements": "elevated walkway (large parallelogram), rail lines (converging polygons), signal tower (tall thin rectangle), arch bridge, platform shelter",
     },
     "intelligence_core": {
-        "archetype": "data center block — dense server stacks, cooling towers venting, status-light grids, cable conduit runs",
+        "archetype": "data center block — dense server stack rows, cooling tower vents, status-light grids (red/green/blue dots), cable conduit bundles on exterior, HVAC units on roof",
         "mood": "precision, latency, controlled environment",
-        "lighting": "internal glow from server indicators, cold blue wash",
+        "lighting": "internal glow from server indicators, cold blue wash from exterior floods",
+        "key_elements": "server rack faces (grid of small rectangles), cooling tower (cylindrical polygon), status LEDs (small circles in grid), conduit bundles, HVAC box",
     },
     "sovereign_quarters": {
-        "archetype": "modular interface tower — stacked terminal bays, antenna array on roof, glass-panel facade, entry airlock",
+        "archetype": "modular interface tower — stacked terminal bays with distinct floor bands, antenna array on roof (3-5 antenna elements), glass-panel facade with screen glow, entry airlock with door detail",
         "mood": "sovereignty, attention, quiet alertness",
-        "lighting": "mixed — warm amber at entry, cold blue from screens above",
+        "lighting": "mixed — warm amber at entry airlock, cold blue from screen panels above",
+        "key_elements": "antenna array (roof, multiple thin verticals), glass panels (large rectangles with interior glow), terminal bays (stacked horizontal bands), airlock door, screen indicator strip",
     },
 }
 
-# ── Attribution (safe public values only) ─────────────────────────────────────
+# ── Attribution ──────────────────────────────────────────────────────────────────────────────
 CREATOR  = "Albert Lane | SovereignAudits™"
 SEC_REF  = "17684-273-411-436"
 LICENSE  = "SOVEREIGN IP LICENSE v1"
 
-# ── Zone key mapping from updates/latest.json display names ───────────────────
 _ZONE_KEY_MAP: dict[str, str] = {
     "City Hall":          "city_hall",
     "Gateway District":   "gateway_district",
@@ -87,10 +96,8 @@ _ZONE_KEY_MAP: dict[str, str] = {
 # ─────────────────────────────────────────────────────────────────────────────
 
 def load_state() -> tuple[dict, dict]:
-    """Read updates/latest.json + generation_state.json and return (zone_data, gen_state)."""
     raw = json.loads(ZONE_STATE.read_text())
 
-    # Transform updates/latest.json array format into keyed dict
     zones: dict[str, dict] = {}
     for z in raw.get("zones", []):
         key = _ZONE_KEY_MAP.get(z["zone"], z["zone"].lower().replace(" ", "_"))
@@ -156,8 +163,7 @@ def get_previous_coaching(zone_key: str, quality_state: dict) -> str:
 
 
 def get_style_evolution_notes(zone_key: str, gen_state: dict) -> str:
-    evolution = gen_state.get("style_evolution", {})
-    return evolution.get(zone_key, "")
+    return gen_state.get("style_evolution", {}).get(zone_key, "")
 
 
 def save_gen_state(gen_state: dict, zone_key: str, narrative_summary: str):
@@ -195,8 +201,7 @@ def advance_narrative(zone_key: str, zone_data: dict, gen_state: dict) -> str:
         f"Current phase: {zone['phase']}\n"
         f"Progress: {zone['progress']}%\n"
         f"Status: {zone['status']}\n"
-        f"Description: {zone['description']}\n"
-        f"Detail: {zone['detail']}\n\n"
+        f"Description: {zone['description']}\n\n"
         f"Recent history:\n{history_text}\n\n"
         "Rules:\n"
         "- One paragraph only. No headers, no bullets, no markdown.\n"
@@ -208,7 +213,7 @@ def advance_narrative(zone_key: str, zone_data: dict, gen_state: dict) -> str:
     )
 
     response = claude.messages.create(
-        model="claude-haiku-4-5-20251001",
+        model=CLAUDE_HAIKU_MODEL,
         max_tokens=256,
         system=(
             "You are the narrator for a civic infrastructure project. "
@@ -221,7 +226,7 @@ def advance_narrative(zone_key: str, zone_data: dict, gen_state: dict) -> str:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Phase 2 — Claude Sonnet: isometric SVG
+# Phase 2 — Claude Sonnet 5: isometric SVG
 # ─────────────────────────────────────────────────────────────────────────────
 
 def generate_zone_svg(
@@ -263,16 +268,16 @@ def generate_zone_svg(
 
     evolution_clause = ""
     if style_evolution_notes:
-        evolution_clause = f"\nLEARNED STYLE IMPROVEMENTS (apply these):\n{style_evolution_notes}\n"
+        evolution_clause = f"\nLEARNED STYLE IMPROVEMENTS (apply these first):\n{style_evolution_notes}\n"
 
     coaching_clause = ""
     if previous_coaching:
-        coaching_clause = f"\nPREVIOUS ITERATION CRITIQUE (address this):\n{previous_coaching}\n"
+        coaching_clause = f"\nPREVIOUS ITERATION CRITIQUE (address this directly):\n{previous_coaching}\n"
 
     system = (
-        "You are a technical SVG illustrator specialising in isometric civic architecture. "
-        "You produce complete, valid, browser-renderable SVG — nothing else. "
-        "No preamble. No explanation. No markdown fences. Raw SVG only, starting with <svg.\n\n"
+        f"You are a technical SVG illustrator specialising in isometric civic architecture. "
+        f"You produce complete, valid, browser-renderable SVG — nothing else. "
+        f"No preamble. No explanation. No markdown fences. Raw SVG only, starting with <svg.\n\n"
         f"ISOMETRIC GEOMETRY (enforce exactly):\n"
         f"- ViewBox: 0 0 800 520\n"
         f"- Isometric projection: x-axis right-down 30°, y-axis left-down 30°, z-axis straight up\n"
@@ -282,26 +287,40 @@ def generate_zone_svg(
         f"- Window/light colour: {T2['ice']} at varying opacity (50-90%)\n"
         f"- Grid lines: {T2['line']} at 20% opacity\n"
         f"- Amber accent: {T2['amber']} — MAXIMUM ONE element\n\n"
-        f"STRUCTURE VOCABULARY:\n{vocab['archetype']}\n\n"
+        f"DEPTH LAYERS (paint back to front in this order):\n"
+        f"1. Sky/background gradient or solid dark\n"
+        f"2. Distant city silhouette or ground plane extension\n"
+        f"3. Primary building structure (largest element)\n"
+        f"4. Secondary structures and infrastructure details\n"
+        f"5. Ground plane, street level, entry features\n"
+        f"6. Foreground details: signage, lighting, texture elements\n\n"
+        f"GEOMETRIC PRECISION:\n"
+        f"- All isometric angles exactly 30°/60° (use tan(30°)=0.577 for calculations)\n"
+        f"- Minimum 50 distinct SVG elements (polygons, rects, circles, lines)\n"
+        f"- Building height: minimum 8 visible floor bands\n"
+        f"- Each floor: distinct horizontal parallelogram with window elements\n"
+        f"- Shadow polygons on all major structures (offset +8px right, +8px down, 40% opacity)\n\n"
+        f"STRUCTURE VOCABULARY:\n{vocab['archetype']}\n"
+        f"KEY ELEMENTS TO INCLUDE: {vocab['key_elements']}\n\n"
         f"MOOD: {vocab['mood']}\n"
         f"LIGHTING: {vocab['lighting']}\n\n"
         f"CONSTRUCTION STATE (iteration {iteration}, {pct}% complete):\n"
         f"{construction_note}\n\n"
         f"NARRATIVE CONTEXT:\n{narrative[:200]}\n"
         f"{evolution_clause}{coaching_clause}\n"
-        "Produce a single complete <svg> element. Portfolio quality."
+        "Produce a single complete <svg> element. Portfolio quality. Minimum 50 elements."
     )
 
     response = claude.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=4096,
+        model=CLAUDE_SVG_MODEL,
+        max_tokens=8192,
         system=system,
         messages=[{
             "role": "user",
             "content": (
                 f"Generate the isometric SVG for {zone['label']}. "
                 f"Phase: {zone['phase']}. Progress: {pct}%. "
-                f"Iteration {iteration}."
+                f"Iteration {iteration}. Include all key elements for this zone."
             ),
         }],
     )
@@ -476,14 +495,163 @@ def update_gallery(zone_data: dict, gen_state: dict, quality_state: dict):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Phase 4 — Style evolution synthesis
+# ─────────────────────────────────────────────────────────────────────────────
+
+def synthesize_style_evolution(zone_key: str, quality_state: dict, gen_state: dict) -> None:
+    """Use Claude Haiku to synthesize actionable style notes from recent quality coaching.
+    Updates gen_state['style_evolution'][zone_key] in-place; caller must save gen_state."""
+    zone_scores = quality_state.get("zones", {}).get(zone_key, {}).get("scores", [])
+    if len(zone_scores) < 2:
+        return
+
+    recent = zone_scores[-4:]
+    coaching_parts = [
+        f"Score {s.get('total', 0)}/40: {s.get('coaching', '')}"
+        for s in recent
+        if s.get("coaching")
+    ]
+    if not coaching_parts:
+        return
+
+    vocab = ZONE_VOCAB.get(zone_key, {})
+    try:
+        response = claude.messages.create(
+            model=CLAUDE_HAIKU_MODEL,
+            max_tokens=350,
+            system=(
+                "You are a technical art director for isometric SVG illustration. "
+                "Synthesize quality coaching into 3-5 concrete actionable bullet points. "
+                "Each bullet: one specific geometric, color, or composition instruction. "
+                "Start each with a dash. No vague adjectives. Direct instructions only."
+            ),
+            messages=[{
+                "role": "user",
+                "content": (
+                    f"Zone: {zone_key}\nArchetype: {vocab.get('archetype', '')}\n"
+                    f"Key elements: {vocab.get('key_elements', '')}\n\n"
+                    f"Quality coaching from recent iterations:\n" +
+                    "\n".join(coaching_parts) +
+                    "\n\nSynthesize into 3-5 actionable style improvements:"
+                ),
+            }],
+        )
+        notes = response.content[0].text.strip()
+        if "style_evolution" not in gen_state:
+            gen_state["style_evolution"] = {}
+        gen_state["style_evolution"][zone_key] = notes
+        print(f"[style_evolution] {zone_key}: synthesized {len(notes)} chars")
+    except Exception as e:
+        print(f"[style_evolution] {zone_key}: synthesis failed ({e}) — skipping")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Phase 5 — README generation
+# ─────────────────────────────────────────────────────────────────────────────
+
+def generate_readme(
+    zone_data: dict,
+    gen_state: dict,
+    quality_state: dict,
+    zone_key: str,
+    narrative: str,
+    iteration: int,
+    timestamp: str,
+) -> None:
+    """Write README.md with latest SVG as hero and full 2x2 city zone grid."""
+    meta  = zone_data["city_meta"]
+    zones = zone_data["zones"]
+
+    def bar(pct: int) -> str:
+        filled = min(10, int(pct / 10))
+        return "█" * filled + "░" * (10 - filled) + f" {pct}%"
+
+    rows = []
+    for zk, z in zones.items():
+        q     = quality_state.get("zones", {}).get(zk, {})
+        avg   = q.get("avg_score", 0)
+        q_str = f"{avg:.0f}/40" if avg else "—"
+        star  = " ★" if zk == zone_key else ""
+        rows.append(
+            f"| **{z['label']}{star}** | {z['layer']} | {z['phase']}"
+            f" | {bar(z['progress'])} | {q_str} |"
+        )
+
+    current_zone = zones[zone_key]
+
+    lines = [
+        f"# {meta['name']}",
+        "",
+        f"> {meta['tagline']}",
+        "",
+        f"*{CREATOR} &nbsp;·&nbsp; SEC Ref: {SEC_REF} &nbsp;·&nbsp; Iteration {iteration:04d}*",
+        "",
+        "---",
+        "",
+        f"## Latest — {current_zone['label']}",
+        "",
+        f'<img src="assets/svg/{zone_key}.svg" width="100%" alt="{current_zone["label"]}"/>',
+        "",
+        f"*{current_zone['phase']} · {current_zone['progress']}% complete*",
+        "",
+        narrative,
+        "",
+        "---",
+        "",
+        "## City Status",
+        "",
+        "| Zone | Layer | Phase | Progress | Quality |",
+        "|------|-------|-------|----------|---------||",
+        *rows,
+        "",
+        f"**Overall momentum:** {meta['overall_phase']}",
+        "",
+        "---",
+        "",
+        "## All Zones",
+        "",
+        "<table>",
+        "<tr>",
+        '<td width="50%">',
+        f'<img src="assets/svg/city_hall.svg" width="100%" alt="City Hall"/>',
+        '<p align="center"><strong>City Hall</strong></p>',
+        "</td>",
+        '<td width="50%">',
+        f'<img src="assets/svg/gateway_district.svg" width="100%" alt="Gateway District"/>',
+        '<p align="center"><strong>Gateway District</strong></p>',
+        "</td>",
+        "</tr>",
+        "<tr>",
+        '<td width="50%">',
+        f'<img src="assets/svg/intelligence_core.svg" width="100%" alt="Intelligence Core"/>',
+        '<p align="center"><strong>Intelligence Core</strong></p>',
+        "</td>",
+        '<td width="50%">',
+        f'<img src="assets/svg/sovereign_quarters.svg" width="100%" alt="Sovereign Quarters"/>',
+        '<p align="center"><strong>Sovereign Quarters</strong></p>',
+        "</td>",
+        "</tr>",
+        "</table>",
+        "",
+        "---",
+        "",
+        f"*Updated: {timestamp} &nbsp;·&nbsp; [Construction log](VISUAL_LOG.md) &nbsp;·&nbsp; [Gallery](gallery.md)*",
+        "",
+        f"*{LICENSE} &nbsp;·&nbsp; Albert Lane*",
+    ]
+
+    README_MD.write_text("\n".join(lines))
+    print(f"[generate_readme] README.md written — iteration {iteration:04d}, {len(lines)} lines")
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Main
 # ─────────────────────────────────────────────────────────────────────────────
 
 def main():
     timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-    print(f"[main] Creative engine v2 — {timestamp}")
+    print(f"[main] Creative engine v3 — {timestamp}")
 
-    # Graceful skip when API key is not yet configured
     if not os.environ.get("CLAUDE_API_KEY", ""):
         print("[main] CLAUDE_API_KEY not configured — skipping this run")
         sys.exit(0)
@@ -506,7 +674,7 @@ def main():
     print("[main] Phase 1 — Claude Haiku narrative...")
     narrative = advance_narrative(zone_key, zone_data, gen_state)
 
-    print("[main] Phase 2 — Claude Sonnet SVG generation...")
+    print(f"[main] Phase 2 — {CLAUDE_SVG_MODEL} SVG generation...")
     svg = generate_zone_svg(
         zone_key, zone_data, narrative, iteration,
         style_evolution_notes=style_notes,
@@ -517,7 +685,13 @@ def main():
     svg_path = write_svg(zone_key, svg, iteration)
     append_visual_log(zone_key, zone_data, narrative, iteration, timestamp)
     update_gallery(zone_data, gen_state, quality_state)
+
+    print("[main] Phase 4 — Style evolution synthesis...")
+    synthesize_style_evolution(zone_key, quality_state, gen_state)
     save_gen_state(gen_state, zone_key, narrative[:120])
+
+    print("[main] Phase 5 — Writing README.md...")
+    generate_readme(zone_data, gen_state, quality_state, zone_key, narrative, iteration, timestamp)
 
     out = os.environ.get("GITHUB_OUTPUT", "")
     if out:
