@@ -3,7 +3,14 @@ name: Hourly Creative Engine
 
 # Fires at :20 every hour. Private infra updates updates/latest.json at :00.
 # Also fires on daily-routine and claude-api-routine dispatches.
-# creative-update.yml (malicious) was purged 2026-07-01 — this is the sole creative workflow.
+# creative-update.yml (malicious) was purged 2026-07-01 -- this is the sole creative workflow.
+#
+# REQUIRES: CLAUDE_API_KEY repo secret (Settings -> Secrets and variables -> Actions).
+# Without it, creative_engine.py skips cleanly (logs "CLAUDE_API_KEY not configured")
+# and every downstream step that depends on its outputs is skipped too -- see the
+# if: steps.engine.outputs.svg_path != '' guards below. Fixed 2026-07-04 after this
+# condition went undetected for ~3 weeks (quality_scorer.py was crashing on empty
+# args instead of being skipped, spamming a duplicate failure issue every run).
 # AUTHORED: Albert Lane | SovereignAudits™ | albertlane.net
 # SEC Whistleblower No. 17684-273-411-436
 on:
@@ -51,6 +58,7 @@ jobs:
 
       - name: Score SVG quality
         id: quality
+        if: steps.engine.outputs.svg_path != ''
         env:
           CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
         run: |
@@ -63,9 +71,11 @@ jobs:
 
       - name: Run provenance bridge
         id: provenance
+        if: steps.engine.outputs.svg_path != ''
         run: python3 .github/scripts/provenance_bridge.py
 
       - name: Commit outputs
+        if: steps.engine.outputs.svg_path != ''
         run: |
           git config user.email "creative-engine@sovereignaudits.bot"
           git config user.name  "SimCity Creative Engine v3"
@@ -79,11 +89,11 @@ jobs:
             ASSETS_FINGERPRINT.json \
             ASSETS_FINGERPRINT.md
           git diff --cached --quiet \
-            && echo "[commit] Nothing changed — skipping." \
+            && echo "[commit] Nothing changed -- skipping." \
             && exit 0
           git commit -m \
             "creative: iter=$(cat generation_state.json | python3 -c 'import sys,json; print(json.load(sys.stdin)[\"iteration\"])') zone=${{ steps.engine.outputs.zone_key }} quality=${{ steps.quality.outputs.quality_total }}/40 [auto]"
-          git push origin main || echo "[creative] Push blocked (branch protection active — state queued for next merge)" >&2
+          git push origin main || echo "[creative] Push blocked (branch protection active -- state queued for next merge)" >&2
 
       - name: Check if autonomous regen needed
         if: steps.quality.outputs.needs_regen == 'true'
@@ -107,7 +117,7 @@ jobs:
                   labels: ["design-request", "auto-regen"],
                   body: [
                     `### Concept`,
-                    `Quality improvement regeneration — automated`,
+                    `Quality improvement regeneration -- automated`,
                     `### Zone`,
                     zone,
                     `### Visual Context`,
@@ -124,18 +134,39 @@ jobs:
         uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
         with:
           script: |
-            await github.rest.issues.create({
+            const hasKey = ${{ secrets.CLAUDE_API_KEY != '' }};
+            const reason = hasKey
+              ? "An unexpected error occurred mid-run. Check the Actions log linked below for the actual traceback."
+              : "CLAUDE_API_KEY is not configured as a repo secret (Settings -> Secrets and variables -> Actions). This blocks all creative generation, not just this run.";
+
+            const title = "[pipeline-failure] Creative engine failing";
+            const existing = await github.rest.issues.listForRepo({
               owner: context.repo.owner,
               repo:  context.repo.repo,
-              title: `Creative engine failure — iter ${{ steps.engine.outputs.iteration || '?' }}`,
-              labels: ["pipeline-failure"],
-              body: [
-                `### Creative Engine Failure`,
-                `**Zone:** ${{ steps.engine.outputs.zone_key || 'unknown' }}`,
-                `**Run:** [Actions log](../../actions/runs/${context.runId})`,
-                ``,
-                `Check: Claude API quota, SVG validity, updates/latest.json format.`,
-                ``,
-                `*${new Date().toISOString()}*`,
-              ].join("\n"),
+              labels: "pipeline-failure",
+              state:  "open",
             });
+            const open = existing.data.find(i => i.title === title);
+
+            const entry = [
+              `**Run:** [Actions log](../../actions/runs/${context.runId})`,
+              `**Reason:** ${reason}`,
+              `*${new Date().toISOString()}*`,
+            ].join("\n");
+
+            if (open) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo:  context.repo.repo,
+                issue_number: open.number,
+                body: entry,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo:  context.repo.repo,
+                title,
+                labels: ["pipeline-failure"],
+                body: `### Creative Engine Failure\n\n${entry}\n\n---\n*This issue is reused for every subsequent failure until closed -- check for new comments rather than expecting a new issue per run.*`,
+              });
+            }
