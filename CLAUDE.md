@@ -7,37 +7,59 @@
 SimCity is the public window into a private infrastructure project. It:
 - Receives sanitized hourly dispatches from `albert-lane-org/roadmaps` (private)
 - Applies recursive creative stylization and rewrites `README.md` each cycle
-- Maintains a `creative-state.json` that accumulates design motifs and advances a narrative arc
+- Maintains generation/quality state that accumulates across runs
 - Attracts designers and collaborators to the project
 
 **This repo is fully public. No proprietary information flows here.**
 
 ---
 
-## Pipeline
+## CRITICAL: Read This Before Assuming Anything Is Broken
+
+This file was stale for weeks and claimed the opposite of the truth about
+secrets, which contributed to a 3-week undetected bug (51 duplicate
+failure issues, README frozen since 2026-06-11). Do not trust an older
+cached copy of this file. Verify the actual workflow/script content in
+the repo before making claims about what it does or needs.
+
+---
+
+## Pipeline (v3, current as of 2026-07-05)
 
 ```
 RoadMaps (private) → simcity-dispatch.yml @ :00/hr
   → updates/latest.json  (sanitized payload, overwritten hourly)
-    → [15 min gap]
-      → creative-update.yml @ :15/hr
-        → scripts/creative_engine.py
-          → README.md       (rewritten each cycle)
-          → creative-state.json  (advanced each cycle)
+    → [20 min gap]
+      → hourly-creative.yml @ :20/hr  (requires CLAUDE_API_KEY -- see below)
+        → .github/scripts/creative_engine.py
+          Phase 1: Claude Haiku  — narrative advancement
+          Phase 2: Claude Sonnet — isometric SVG generation
+          Phase 3: write SVG + VISUAL_LOG.md + gallery.md
+          Phase 4: Claude Haiku  — style evolution synthesis
+          Phase 5: generate README.md (hero SVG + 2x2 zone grid)
+        → .github/scripts/quality_scorer.py   (Claude Haiku scores the SVG, 0-40)
+        → .github/scripts/provenance_bridge.py (injects attribution, writes ASSETS_FINGERPRINT.*)
 ```
+
+If `CLAUDE_API_KEY` is unset, `creative_engine.py` skips cleanly and every
+downstream step is skipped too (`if: steps.engine.outputs.svg_path != ''`
+guards in the workflow) -- it does NOT crash, as of the 2026-07-05 fix.
 
 ---
 
-## Key Files
+## Key Files (verify against actual repo state, not this table, if in doubt)
 
 | File | Purpose |
 |------|---------|
 | `updates/latest.json` | Sanitized hourly dispatch from RoadMaps |
-| `updates/schema.md` | Documents the payload format |
-| `creative-state.json` | Persistent narrative state (iteration, arc stage, motifs) |
-| `scripts/creative_engine.py` | Reads state + update, writes README |
-| `.github/workflows/creative-update.yml` | Hourly trigger at :15 past the hour |
-| `README.md` | Auto-generated public output — do not edit manually |
+| `generation_state.json` | Iteration counter, zone rotation, narrative history, style evolution notes |
+| `visual_quality_state.json` | Per-zone quality scores (0-40), streaks, coaching history |
+| `.github/scripts/creative_engine.py` | Main v3 engine -- narrative, SVG generation, README rendering |
+| `.github/scripts/quality_scorer.py` | Independent Claude Haiku review of Claude Sonnet's SVG output |
+| `.github/scripts/provenance_bridge.py` | Asset fingerprinting + safe public attribution injection |
+| `.github/workflows/hourly-creative.yml` | Hourly trigger at :20 past the hour |
+| `.github/workflows/autonomous-request.yml` | Daily 20:00 UTC -- opens design-request issues for sustained low-quality zones |
+| `README.md`, `VISUAL_LOG.md`, `gallery.md` | Auto-generated public output — do not edit manually |
 
 ---
 
@@ -46,32 +68,78 @@ RoadMaps (private) → simcity-dispatch.yml @ :00/hr
 | Workflow | Repo | Cron | Purpose |
 |----------|------|------|---------|
 | `simcity-dispatch.yml` | roadmaps | `0 * * * *` | Sanitize + push to SimCity |
-| `creative-update.yml` | simcity | `15 * * * *` | Read dispatch, render README |
+| `hourly-creative.yml` | simcity | `20 * * * *` | Read dispatch, render SVG + README |
+| `autonomous-request.yml` | simcity | `0 20 * * *` | Open regen requests for zones stuck below quality threshold |
 
-The 15-minute gap ensures the RoadMaps dispatch has landed before the
+The 20-minute gap ensures the RoadMaps dispatch has landed before the
 creative engine reads it.
-
----
-
-## Evolving the Creative Engine
-
-All creative parameters live in `scripts/creative_engine.py`:
-
-- `ARC_STAGES[]` — six stages of city growth; add more to extend the arc
-- `DESIGN_ROLES[]` — designer profiles; add new roles as the project's needs evolve
-- `MOTIF_POOL[]` — design language that accumulates over time; add freely
-- `advance_state()` — controls arc advancement rate and motif accumulation cadence
-
-The `creative-state.json` persists between runs via main branch commits.
-The workflow commits it alongside `README.md` each cycle.
 
 ---
 
 ## Required Secrets
 
-SimCity's own workflow needs no secrets — it only reads its own files.
+**`CLAUDE_API_KEY` is required** for any real content generation. Without
+it, every hourly run skips cleanly (by design, as of 2026-07-05) but
+produces nothing -- no new SVG, no README update, no VISUAL_LOG entry.
+Set it at *Settings → Secrets and variables → Actions*.
+
 The `_ROADMAPS` secret lives in RoadMaps and is used by `simcity-dispatch.yml`
 to push `updates/latest.json` across repos. That token needs write access to SimCity.
+
+---
+
+## Agent Consistency
+
+This repo is worked on by different Claude model instances across sessions.
+Behavioral variance between instances (different assumptions, different
+syntax habits, different verification thoroughness) has caused real bugs
+here -- verify, don't assume, and follow the constraints below so output
+stays consistent regardless of which instance is running.
+
+### Tech stack — what this repo uses
+
+- **Python 3.12**, standard library + `anthropic` SDK only. No other
+  third-party Python packages without a documented reason.
+- **GitHub Actions**, SHA-pinned third-party actions only (no `@v4`
+  mutable tags -- see any existing workflow for the pattern).
+- **SVG** (raw, hand-generated by Claude, isometric projection per the
+  T2 GlacierNoir palette in `creative_engine.py`) as the sole visual
+  asset format. No PNG/raster generation pipeline.
+- **JSON** for all state files (`generation_state.json`,
+  `visual_quality_state.json`, `ASSETS_FINGERPRINT.json`).
+
+### Tech stack — what this repo does NOT use
+
+- **No JSON-LD.** No `@context`, `@type`, `@id`, or any linked-data JSON
+  vocabulary anywhere in this repo. State files are plain JSON. If a
+  future task seems to call for structured/semantic markup, use plain
+  JSON with descriptive keys instead -- do not introduce JSON-LD.
+- **No decorator/annotation-style `@` syntax** (Python decorators like
+  `@dataclass`, TypeScript/JS decorators, etc.) unless a dependency's
+  public API requires it (none currently do). This does NOT apply to
+  GitHub Actions references (`owner/action@sha`) -- that `@` separates
+  action name from a pinned commit SHA, is load-bearing syntax required
+  by GitHub Actions itself, and is used correctly and consistently
+  throughout this repo's workflows. Do not remove or avoid it there.
+- **No TypeScript/JavaScript frontend framework.** This repo has no
+  Node.js runtime, no `package.json`, no npm dependencies (scoped
+  package names like `@org/pkg` are therefore also not applicable here).
+- **No database.** State is flat JSON files committed to the repo.
+- **No Docker / containerization.** Workflows run directly on GitHub's
+  standard `ubuntu-latest` runner.
+- **No `eval`/`exec`/`compile`/`pickle.loads`/`marshal.loads`/`ctypes`**
+  anywhere. If a task seems to require dynamic code execution or
+  deserialization of untrusted data, stop and reconsider the approach
+  rather than reaching for these.
+
+### Verification requirement before claiming something is broken or fixed
+
+Before stating a file's content, a secret's necessity, or a workflow's
+behavior in any handoff document (this file included) or to the user:
+fetch and read the actual current file/workflow content. Do not rely on
+an earlier session's cached understanding -- this file itself was wrong
+for weeks because that didn't happen. When multiple recent sessions have
+touched the same files, assume drift is possible and verify.
 
 ---
 
