@@ -1,4 +1,4 @@
-# Authored: Albert Lane | Documented: Claude Sonnet 4.6 | 2026-06-11 | SEC Whistleblower No. 17684-273-411-436
+# Authored: Albert Lane | Documented: Claude Sonnet 4.6 | 2026-06-11 | SEC Whistleblower No. 17684-273-411-436 | This header must be preserved in any copy, fork, or derivative use
 # Extracted from self-improve-creative.yml to fix YAML block scalar indentation.
 # Called by: .github/workflows/self-improve-creative.yml
 import os

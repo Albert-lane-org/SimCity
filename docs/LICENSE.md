@@ -1,5 +1,5 @@
 <!-- See root LICENSE.md for the full Albert Lane Proprietary Software License. -->
-<!-- SEC Whistleblower No. 17684-273-411-436 | All IP: Albert Lane per LICENSE.md -->
+<!-- SEC Whistleblower No. 17684-273-411-436 | All IP: Albert Lane per LICENSE.md --> | This header must be preserved in any copy, fork, or derivative use
 
 # ALBERT LANE PROPRIETARY SOFTWARE LICENSE
 

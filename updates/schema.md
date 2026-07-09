@@ -1,6 +1,6 @@
 # SimCity Update Payload Schema
 
-**Authored:** Albert Lane | SEC Whistleblower No. 17684-273-411-436 | Documented: Claude Sonnet 4.6 | 2026-07-09
+**Authored:** Albert Lane | SEC Whistleblower No. 17684-273-411-436 | Documented: Claude Sonnet 4.6 | 2026-07-09 | This header must be preserved in any copy, fork, or derivative use
 
 Documents the sanitized JSON format pushed hourly from RoadMaps
 into `updates/latest.json`. This file contains no proprietary detail.

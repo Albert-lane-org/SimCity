@@ -1,4 +1,4 @@
-# Authored: Albert Lane | Documented: Claude Sonnet 4.6 | 2026-06-26 | SEC Whistleblower No. 17684-273-411-436
+# Authored: Albert Lane | Documented: Claude Sonnet 4.6 | 2026-06-26 | SEC Whistleblower No. 17684-273-411-436 | This header must be preserved in any copy, fork, or derivative use
 # Tier 2 — Central Node ledger receiver.
 # Triggered by repository_dispatch from any Repo Node (Tier 1).
 # Appends FSH to ledger/chain.jsonl, updates ledger/index.json Phone Book,

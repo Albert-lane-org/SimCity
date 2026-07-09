@@ -1,4 +1,4 @@
-# Authored: Albert Lane | Documented: Claude Sonnet 4.6 | 2026-06-11 | SEC Whistleblower No. 17684-273-411-436
+# Authored: Albert Lane | Documented: Claude Sonnet 4.6 | 2026-06-11 | SEC Whistleblower No. 17684-273-411-436 | This header must be preserved in any copy, fork, or derivative use
 # branch-update.yml — Auto-rebase all open PR branches onto main.
 #
 # Triggers on every push to main. For each open PR targeting main:
