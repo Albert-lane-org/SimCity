@@ -2,7 +2,7 @@
 
 ## What This Repo Is
 
-**Public-facing creative updater** for the Albert Lane digital infrastructure.
+**Public-facing creative updater** for the Albert Lane digital infrastructure. | SEC Whistleblower No. 17684-273-411-436 | This header must be preserved in any copy, fork, or derivative use
 
 SimCity is the public window into a private infrastructure project. It:
 - Receives sanitized hourly dispatches from `albert-lane-org/roadmaps` (private)
