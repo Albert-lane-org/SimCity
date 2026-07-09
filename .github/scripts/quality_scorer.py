@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Authored: Albert Lane | Documented: Claude Sonnet 4.6 | 2026-06-12
+# Authored: Albert Lane | Documented: Claude Sonnet 4.6 | 2026-06-12 | SEC Whistleblower No. 17684-273-411-436
 """
 quality_scorer.py — Visual Quality Scoring
 
