@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="data-canary-token" content="96477a31be9ee7cc25a71694b3f72bee">
+  <meta name="provenance" content="SEC #17684-273-411-436">
+  <title>Albert Lane Estate — SimCity Sovereign Portal</title>
+  <style>
+    :root {
+      --bg: #0A1628;
+      --surface: #0F1F3D;
+      --accent: #153A5F;
+      --accent2: #2A5A8F;
+      --danger: #FF3868;
+      --text: #E0E8F4;
+      --muted: #7A90B0;
+      --border: #1E3A5A;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.6; }
+    a { color: var(--accent2); text-decoration: none; }
+    a:hover { color: var(--danger); }
+    .header { background: var(--surface); border-bottom: 2px solid var(--border); padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; }
+    .header-title { font-size: 22px; font-weight: bold; letter-spacing: 2px; color: var(--text); }
+    .header-sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
+    .sec-badge { background: var(--danger); color: #fff; padding: 3px 8px; font-size: 11px; border-radius: 3px; }
+    .nav-tabs { background: var(--surface); border-bottom: 1px solid var(--border); display: flex; padding: 0 40px; }
+    .tab { padding: 12px 20px; cursor: pointer; color: var(--muted); font-size: 13px; border-bottom: 2px solid transparent; }
+    .tab.active { color: var(--text); border-bottom-color: var(--accent2); }
+    .main { max-width: 1400px; margin: 0 auto; padding: 32px 40px; }
+    section { margin-bottom: 48px; }
+    h2 { font-size: 16px; letter-spacing: 1px; color: var(--accent2); border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 20px; text-transform: uppercase; }
+    .zone-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .zone-cell { background: var(--surface); border: 1px solid var(--border); padding: 16px; border-radius: 4px; }
+    .zone-label { font-weight: bold; color: var(--text); margin-bottom: 4px; }
+    .zone-coord { color: var(--accent2); font-size: 11px; margin-bottom: 8px; }
+    .zone-style { color: var(--muted); font-size: 12px; }
+    .deliverables-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .deliverable-card { background: var(--surface); border: 1px solid var(--border); padding: 16px; border-radius: 4px; }
+    .del-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .del-title { font-weight: bold; font-size: 14px; }
+    .del-phase { color: var(--accent2); font-size: 11px; background: var(--accent); padding: 2px 6px; border-radius: 2px; }
+    .del-repo { color: var(--muted); font-size: 11px; margin-bottom: 8px; }
+    .del-desc { color: var(--text); font-size: 12px; line-height: 1.5; }
+    .phase-card { background: var(--surface); border: 1px solid var(--border); padding: 14px 16px; border-radius: 4px; margin-bottom: 8px; }
+    .phase-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .phase-id { font-weight: bold; color: var(--text); }
+    .phase-badge { font-size: 10px; padding: 2px 6px; border-radius: 2px; color: #fff; }
+    .phase-label { color: var(--text); font-size: 13px; margin-bottom: 4px; }
+    .phase-note { color: var(--muted); font-size: 11px; }
+    .teaser-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .teaser-card { background: var(--surface); border: 1px solid var(--accent); padding: 16px; border-radius: 4px; }
+    .teaser-label { font-weight: bold; color: var(--accent2); margin-bottom: 8px; font-size: 15px; }
+    .coord-badge { display: inline-block; background: var(--accent); color: var(--text); padding: 2px 8px; margin: 2px; font-size: 11px; border-radius: 2px; }
+    .teaser-desc { color: var(--text); font-size: 12px; line-height: 1.6; margin-top: 8px; }
+    .teaser-status { color: var(--muted); font-size: 11px; margin-top: 8px; font-style: italic; }
+    .sec-section table { width: 100%; border-collapse: collapse; }
+    .mod-table th { background: var(--accent); color: var(--text); padding: 10px 12px; text-align: left; font-size: 12px; }
+    .mod-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-size: 12px; vertical-align: top; }
+    .mod-table tr:hover td { background: var(--surface); }
+    .mod-file { color: var(--accent2); white-space: nowrap; }
+    .mod-title { font-weight: bold; }
+    .mod-desc { color: var(--muted); }
+    .sec-note { color: var(--muted); font-size: 12px; margin-bottom: 16px; }
+    .footer { background: var(--surface); border-top: 1px solid var(--border); padding: 20px 40px; color: var(--muted); font-size: 11px; text-align: center; }
+    code { background: var(--accent); padding: 1px 4px; border-radius: 2px; font-family: 'Courier New', monospace; font-size: 11px; }
+    @media (max-width: 900px) {
+      .deliverables-grid, .teaser-grid, .zone-grid { grid-template-columns: 1fr; }
+      .main { padding: 16px; }
+    }
+    </style>
+</head>
+<body>
+  <header class="header">
+    <div>
+      <div class="header-title">⬡ ALBERT LANE ESTATE</div>
+      <div class="header-sub">Sovereign Infrastructure Portal · albertlane.net · Iteration #0</div>
+    </div>
+    <div>
+      <span class="sec-badge">SEC #17684-273-411-436</span>
+    </div>
+  </header>
+  <nav class="nav-tabs">
+    <div class="tab active">Deliverables</div>
+    <div class="tab">Architecture</div>
+    <div class="tab">Forensics</div>
+    <div class="tab">MacroHarder™</div>
+  </nav>
+  <main class="main">
+    
+    <section class="deliverables-section">
+      <h2>Estate Deliverables — Phase 17</h2>
+      <div class="deliverables-grid">
+        <div class="deliverable-card">
+          <div class="del-top">
+            <span class="del-title">Navigation Hub</span>
+            <span class="del-phase">Phase 17</span>
+          </div>
+          <div class="del-repo">albert-lane-org/roadmaps</div>
+          <div class="del-desc">C-Stream™ canonical spec, receiver beacon, sovereign architecture</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-top">
+            <span class="del-title">MCP Gateway</span>
+            <span class="del-phase">Phase 13</span>
+          </div>
+          <div class="del-repo">albert-lane-org/lane-mcp</div>
+          <div class="del-desc">procurement_engine + government modules; 25 tools</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-top">
+            <span class="del-title">XML Pipeline</span>
+            <span class="del-phase">Phase 8</span>
+          </div>
+          <div class="del-repo">albert-lane-org/sqlxml</div>
+          <div class="del-desc">AR/VR storage layer; WriteMode::ARPayload; WebSocket ar_bridge</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-top">
+            <span class="del-title">Sovereign Browser</span>
+            <span class="del-phase">Phase 8</span>
+          </div>
+          <div class="del-repo">albert-lane-org/tauri-rustxml</div>
+          <div class="del-desc">Froi Browser fusion; frontend_bridge WASM; nexus.browser.* + nexus.ar.*</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-top">
+            <span class="del-title">MacroHarder™</span>
+            <span class="del-phase">Phase 14</span>
+          </div>
+          <div class="del-repo">albert-lane-org/macrohard</div>
+          <div class="del-desc">5D cell model; lane-mcp cache (35 tools); kriging5d</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-top">
+            <span class="del-title">Gov SEC-IRS-FTC</span>
+            <span class="del-phase">Phase 1</span>
+          </div>
+          <div class="del-repo">albert-lane-org/government</div>
+          <div class="del-desc">8 forensic modules; evidence ledger; logistics portal</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-top">
+            <span class="del-title">Creative Hub</span>
+            <span class="del-phase">Phase 9</span>
+          </div>
+          <div class="del-repo">albert-lane-org/simcity</div>
+          <div class="del-desc">Autonomous web portal; T2 GlacierNoir SVG engine</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-top">
+            <span class="del-title">Delivery Hub</span>
+            <span class="del-phase">Phase 11</span>
+          </div>
+          <div class="del-repo">albert-lane-org/procurement</div>
+          <div class="del-desc">deliverables/ scaffold; push/pull engine; lane_procurement_pull</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-top">
+            <span class="del-title">Terrain Intelligence</span>
+            <span class="del-phase">Phase 12</span>
+          </div>
+          <div class="del-repo">albert-lane-org/maps</div>
+          <div class="del-desc">Topographic analysis; contours; watershed; 78 tests</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-top">
+            <span class="del-title">IP Forensics</span>
+            <span class="del-phase">Phase 12</span>
+          </div>
+          <div class="del-repo">albert-lane-org/ip-forensics</div>
+          <div class="del-desc">JS/TS structural scanner; provenance bomber; canary seeder</div>
+        </div>
+        <div class="deliverable-card">
+          <div class="del-top">
+            <span class="del-title">Canary Monitor</span>
+            <span class="del-phase">Phase 10</span>
+          </div>
+          <div class="del-repo">albert-lane-org/sovereign-canary</div>
+          <div class="del-desc">DMCA lifecycle; /integrity; log verification; /feed.atom</div>
+        </div></div>
+    </section>
+    
+    <section class="grid-section">
+      <h2>Creative Engine — Iteration 0</h2>
+      <div class="zone-grid">
+        <div class="zone-cell">
+          <div class="zone-label">City Hall</div>
+          <div class="zone-coord">5D:[0,0,0,0,0]</div>
+          <div class="zone-style">Evolving…</div>
+        </div>
+        <div class="zone-cell">
+          <div class="zone-label">Gateway District</div>
+          <div class="zone-coord">5D:[1,0,0,0,0]</div>
+          <div class="zone-style">Evolving…</div>
+        </div>
+        <div class="zone-cell">
+          <div class="zone-label">Intelligence Core</div>
+          <div class="zone-coord">5D:[2,0,0,0,0]</div>
+          <div class="zone-style">Evolving…</div>
+        </div>
+        <div class="zone-cell">
+          <div class="zone-label">Sovereign Quarters</div>
+          <div class="zone-coord">5D:[3,0,0,0,0]</div>
+          <div class="zone-style">Evolving…</div>
+        </div></div>
+    </section>
+    
+    <section class="teaser-section">
+      <h2>MacroHarder™ — Live Preview</h2>
+      <div class="teaser-grid">
+        <div class="teaser-card">
+          <div class="teaser-label">5D Workbook</div>
+          <div class="teaser-coords">
+            <span class="coord-badge">COL</span>
+            <span class="coord-badge">ROW</span>
+            <span class="coord-badge">LAYER</span>
+            <span class="coord-badge" style="color:#FF3868">TIME</span>
+            <span class="coord-badge" style="color:#2A5A8F">DOMAIN</span>
+          </div>
+          <div class="teaser-desc">Excel taken to a fifth-dimensional level. Cells are volumes; sheets are 5D tensors. Procurement and terrain data cached live via lane-mcp.</div>
+        </div>
+        <div class="teaser-card">
+          <div class="teaser-label">Procurement Module</div>
+          <div class="teaser-desc">
+            <strong>Sample:</strong> Permit pipeline board · EV ledger · Vendor reliability<br>
+            Data sourced from albert-lane-org/procurement via lane-mcp gateway.
+          </div>
+          <div class="teaser-status">Status: Awaiting <code>CLOUDFLARE_API_TOKEN</code> for live deploy</div>
+        </div>
+        <div class="teaser-card">
+          <div class="teaser-label">Terrain Module</div>
+          <div class="teaser-desc">
+            Oregon DEM elevation lattice bound to MacroHarder (col, row, layer) volume view.<br>
+            Runoff · Erosion · Hillshade · Soil pH — 78 tests passing.
+          </div>
+          <div class="teaser-status">Status: Code-complete · Phase 12 ✅</div>
+        </div>
+      </div>
+    </section>
+    
+    <section class="sec-section">
+      <h2>Government SEC-IRS-FTC Forensic Suite</h2>
+      <p class="sec-note">All modules write to <code>federal_evidence_cache.db</code> (SQLite). SSRF-guarded. No credentials committed.</p>
+      <table class="mod-table">
+        <thead><tr><th>Module</th><th>Title</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="mod-file"><code>network_visualizer.py</code></td>
+            <td class="mod-title">Corporate Network & Adjacency Visualizer</td>
+            <td class="mod-desc">WHOIS, DNS, RDAP, Vis.js evidence graph → federal_evidence_cache.db</td>
+          </tr>
+          <tr>
+            <td class="mod-file"><code>irs_tracker.py</code></td>
+            <td class="mod-title">IRS Financial Discrepancy & Flow Tracker</td>
+            <td class="mod-desc">XBRL concept fetcher, numpy z-score anomaly detection, circular flow DFS</td>
+          </tr>
+          <tr>
+            <td class="mod-file"><code>ftc_auditor.py</code></td>
+            <td class="mod-title">FTC Trade & Corporate Identity Auditor</td>
+            <td class="mod-desc">Deception pattern regex, endpoint identity verification, SEC cross-check</td>
+          </tr>
+          <tr>
+            <td class="mod-file"><code>evidence_ledger.py</code></td>
+            <td class="mod-title">Cross-Agency Forensic Evidence Ledger</td>
+            <td class="mod-desc">Cryptographic chain ledger, Merkle root, JSONL + SQLite</td>
+          </tr>
+          <tr>
+            <td class="mod-file"><code>water_utilities.py</code></td>
+            <td class="mod-title">Water Treatment & Utilities Engine</td>
+            <td class="mod-desc">Hazen-Williams pipe flow, EPA MCL compliance check, USGS ingestion</td>
+          </tr>
+          <tr>
+            <td class="mod-file"><code>permit_system.py</code></td>
+            <td class="mod-title">Commercial & Permit Acquisition System</td>
+            <td class="mod-desc">OR/WA zoning, EIA thresholds, expired permit detection</td>
+          </tr>
+          <tr>
+            <td class="mod-file"><code>logistics_portal.py</code></td>
+            <td class="mod-title">Oregon Logistics Portal</td>
+            <td class="mod-desc">FMCSA carrier registry, route optimizer, underwriter matching</td>
+          </tr>
+          <tr>
+            <td class="mod-file"><code>employment_system.py</code></td>
+            <td class="mod-title">Employment Department System</td>
+            <td class="mod-desc">UI benefit calculator (OR/WA), job matching engine, SUTA tax</td>
+          </tr></tbody>
+      </table>
+    </section>
+  </main>
+  <footer class="footer">
+    SEC #17684-273-411-436 | §16 CFR PART 465 | PROPRIETARY TO ALBERT LANE ESTATE | albertlane.net<br>
+    Built: 2026-07-21T20:55:40.844161+00:00 | Last dispatch: Not yet run | Canary: 96477a31be9ee7cc…
+  </footer>
+</body>
+</html>

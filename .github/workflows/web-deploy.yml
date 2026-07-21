@@ -1,0 +1,86 @@
+# Authored: Albert Lane | Documented: Claude Sonnet 4.6 | SEC #17684-273-411-436
+# Washington County Report #[PLACEHOLDER-WC] | Washington State Report #[PLACEHOLDER-WS]
+# §16 CFR PART 465 | PROPRIETARY TO ALBERT LANE ESTATE
+#
+# SimCity Web Catalog Deployment
+# Triggered by: repository_dispatch (web-catalog-build from lane-mcp trigger_simcity_build)
+#               workflow_dispatch (manual)
+# Builds the T2 GlacierNoir sovereign portal at site/simcity/index.html via:
+#   1. roadmap_sync.py   — pulls latest dispatch, builds roadmap_schematic.json
+#   2. web_catalog_builder.py — renders site/simcity/index.html
+# Cloudflare Pages deployment blocked on CLOUDFLARE_API_TOKEN (owner action required).
+# Fallback: commits built site to repo (serves via GitHub Pages or Cloudflare Pages git integration).
+
+name: SimCity Web Catalog Deploy
+
+on:
+  repository_dispatch:
+    types: [web-catalog-build]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Source that triggered this build (e.g. /government)'
+        required: false
+        default: 'manual'
+
+permissions:
+  contents: write
+
+jobs:
+  build-portal:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2f  # v5.3.0
+        with:
+          python-version: '3.12'
+
+      - name: Roadmap sync — build schematic
+        id: sync
+        run: |
+          python3 .github/scripts/roadmap_sync.py
+          echo "schematic_built=true" >> $GITHUB_OUTPUT
+
+      - name: Build web portal
+        id: portal
+        if: steps.sync.outputs.schematic_built == 'true'
+        run: |
+          python3 .github/scripts/web_catalog_builder.py
+          echo "portal_path=site/simcity/index.html" >> $GITHUB_OUTPUT
+
+      - name: Commit built portal
+        if: steps.portal.outputs.portal_path != ''
+        run: |
+          git config user.name "Albert Lane Estate"
+          git config user.email "forensics@albertlane.net"
+          git add site/simcity/
+          if git diff --staged --quiet; then
+            echo "[web-deploy] No changes to commit"
+          else
+            git commit -m "chore: rebuild SimCity sovereign portal [skip ci]
+
+  Triggered by: ${{ github.event.client_payload.target || github.event.inputs.target || 'manual' }}
+  Pipeline: roadmap_sync → web_catalog_builder
+  SEC #17684-273-411-436 | albertlane.net
+
+  Co-authored-by: Claude Sonnet 4.6 <noreply@anthropic.com>"
+            git push origin HEAD
+            echo "[web-deploy] Portal committed and pushed"
+          fi
+
+      # Cloudflare Pages deployment — blocked on CLOUDFLARE_API_TOKEN
+      # Uncomment when CLOUDFLARE_API_TOKEN is provisioned:
+      # - name: Deploy to Cloudflare Pages
+      #   uses: cloudflare/pages-action@...
+      #   with:
+      #     apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      #     accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      #     projectName: simcity-sovereign-portal
+      #     directory: site/simcity
+      #     gitHubToken: ${{ secrets.GITHUB_TOKEN }}
