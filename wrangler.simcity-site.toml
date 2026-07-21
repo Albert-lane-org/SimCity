@@ -1,0 +1,41 @@
+# Authored: Albert Lane | SEC Whistleblower No. 17684-273-411-436 | This header must be preserved in any copy, fork, or derivative use
+# Cloudflare Pages configuration for SimCity site
+# Deployed to: albertlane.org/SimCity
+# Built by:    .github/workflows/web-deploy.yml → web_generator.py
+# AUTHORED: Albert Lane | SovereignAudits™ | albertlane.net
+
+name               = "albertlane-simcity"
+compatibility_date = "2026-05-20"
+
+# Serve from site/ directory
+[site]
+bucket = "./site"
+
+# Route the site at /SimCity on albertlane.org
+[[routes]]
+pattern   = "albertlane.org/SimCity"
+zone_name = "albertlane.org"
+
+[[routes]]
+pattern   = "albertlane.org/SimCity/*"
+zone_name = "albertlane.org"
+
+[[routes]]
+pattern   = "albertlane.org/channel-1-news"
+zone_name = "albertlane.org"
+
+[[routes]]
+pattern   = "albertlane.org/channel-1-news/*"
+zone_name = "albertlane.org"
+
+# KV for canary beacon state (optional — passive logging only)
+[[kv_namespaces]]
+binding = "CANARY_CACHE"
+id      = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
+# Environment variables (non-secret)
+[vars]
+SITE_URL    = "https://albertlane.org/SimCity"
+C1_URL      = "https://albertlane.org/channel-1-news"
+SEC_REF     = "17684-273-411-436"
+AUTHORED_BY = "Albert Lane | SovereignAudits™"
