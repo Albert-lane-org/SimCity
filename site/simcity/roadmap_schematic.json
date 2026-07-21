@@ -1,0 +1,200 @@
+{
+  "schematic_version": "1.0",
+  "provenance": "SEC #17684-273-411-436",
+  "built_at": "2026-07-21T20:55:40.712952+00:00",
+  "dispatched_at": "2026-07-21T20:55:40.712747+00:00",
+  "iteration": 0,
+  "billboard_entries": [
+    {
+      "repo": "roadmaps",
+      "phase": "Phase 17",
+      "summary": "C-Stream\u2122 spec, phase 17 sovereign architecture, receiver beacon",
+      "billboard_text": "[ROADMAPS] C-Stream\u2122 spec, phase 17 sovereign architecture, receiver beacon",
+      "coordinates_5d": {
+        "col": 18,
+        "row": 0,
+        "layer": 17,
+        "time": 0,
+        "domain": 0
+      },
+      "rendered_at": "2026-07-21T20:55:40.712829+00:00",
+      "provenance": "SEC #17684-273-411-436"
+    },
+    {
+      "repo": "lane-mcp",
+      "phase": "Phase 13",
+      "summary": "procurement_engine + government MCP modules; 25 registered tools",
+      "billboard_text": "[LANE-MCP] procurement_engine + government MCP modules; 25 registered tools",
+      "coordinates_5d": {
+        "col": 81,
+        "row": 0,
+        "layer": 13,
+        "time": 0,
+        "domain": 1
+      },
+      "rendered_at": "2026-07-21T20:55:40.712888+00:00",
+      "provenance": "SEC #17684-273-411-436"
+    },
+    {
+      "repo": "sqlxml",
+      "phase": "Phase 8",
+      "summary": "WriteMode::ARPayload AR/VR storage; WebSocket ar_bridge; 150+ tests",
+      "billboard_text": "[SQLXML] WriteMode::ARPayload AR/VR storage; WebSocket ar_bridge; 150+ tests",
+      "coordinates_5d": {
+        "col": 53,
+        "row": 0,
+        "layer": 8,
+        "time": 0,
+        "domain": 0
+      },
+      "rendered_at": "2026-07-21T20:55:40.712893+00:00",
+      "provenance": "SEC #17684-273-411-436"
+    },
+    {
+      "repo": "tauri-rustxml",
+      "phase": "Phase 8",
+      "summary": "Froi Browser IP claim; frontend_bridge WASM; nexus.browser.* nexus.ar.*",
+      "billboard_text": "[TAURI-RUSTXML] Froi Browser IP claim; frontend_bridge WASM; nexus.browser.* nexus.ar.*",
+      "coordinates_5d": {
+        "col": 29,
+        "row": 0,
+        "layer": 8,
+        "time": 0,
+        "domain": 0
+      },
+      "rendered_at": "2026-07-21T20:55:40.712897+00:00",
+      "provenance": "SEC #17684-273-411-436"
+    },
+    {
+      "repo": "macrohard",
+      "phase": "Phase 14",
+      "summary": "5D CellAddress; kriging5d; lane-mcp cache 35 tools; 86 tests",
+      "billboard_text": "[MACROHARD] 5D CellAddress; kriging5d; lane-mcp cache 35 tools; 86 tests",
+      "coordinates_5d": {
+        "col": 29,
+        "row": 0,
+        "layer": 14,
+        "time": 0,
+        "domain": 3
+      },
+      "rendered_at": "2026-07-21T20:55:40.712900+00:00",
+      "provenance": "SEC #17684-273-411-436"
+    },
+    {
+      "repo": "government",
+      "phase": "Phase 1",
+      "summary": "8 forensic modules; evidence ledger; logistics portal; employment system",
+      "billboard_text": "[GOVERNMENT] 8 forensic modules; evidence ledger; logistics portal; employment system",
+      "coordinates_5d": {
+        "col": 52,
+        "row": 0,
+        "layer": 1,
+        "time": 0,
+        "domain": 2
+      },
+      "rendered_at": "2026-07-21T20:55:40.712918+00:00",
+      "provenance": "SEC #17684-273-411-436"
+    },
+    {
+      "repo": "simcity",
+      "phase": "Phase 9",
+      "summary": "Autonomous web portal; T2 GlacierNoir; roadmap sync pipeline",
+      "billboard_text": "[SIMCITY] Autonomous web portal; T2 GlacierNoir; roadmap sync pipeline",
+      "coordinates_5d": {
+        "col": 71,
+        "row": 0,
+        "layer": 9,
+        "time": 0,
+        "domain": 0
+      },
+      "rendered_at": "2026-07-21T20:55:40.712923+00:00",
+      "provenance": "SEC #17684-273-411-436"
+    },
+    {
+      "repo": "procurement",
+      "phase": "Phase 11",
+      "summary": "deliverables/ delivery hub; push/pull engine; lane_procurement_pull",
+      "billboard_text": "[PROCUREMENT] deliverables/ delivery hub; push/pull engine; lane_procurement_pull",
+      "coordinates_5d": {
+        "col": 1,
+        "row": 0,
+        "layer": 11,
+        "time": 0,
+        "domain": 1
+      },
+      "rendered_at": "2026-07-21T20:55:40.712931+00:00",
+      "provenance": "SEC #17684-273-411-436"
+    },
+    {
+      "repo": "maps",
+      "phase": "Phase 12",
+      "summary": "Topographic analysis; contours; watershed; 78 tests passing",
+      "billboard_text": "[MAPS] Topographic analysis; contours; watershed; 78 tests passing",
+      "coordinates_5d": {
+        "col": 0,
+        "row": 0,
+        "layer": 12,
+        "time": 0,
+        "domain": 3
+      },
+      "rendered_at": "2026-07-21T20:55:40.712941+00:00",
+      "provenance": "SEC #17684-273-411-436"
+    },
+    {
+      "repo": "ip-forensics",
+      "phase": "Phase 12",
+      "summary": "JS/TS structural scanner; provenance_bomber; canary_seeder",
+      "billboard_text": "[IP-FORENSICS] JS/TS structural scanner; provenance_bomber; canary_seeder",
+      "coordinates_5d": {
+        "col": 54,
+        "row": 0,
+        "layer": 12,
+        "time": 0,
+        "domain": 2
+      },
+      "rendered_at": "2026-07-21T20:55:40.712947+00:00",
+      "provenance": "SEC #17684-273-411-436"
+    },
+    {
+      "repo": "sovereign-canary",
+      "phase": "Phase 10",
+      "summary": "DMCA lifecycle; /integrity endpoint; Atom feed; log verify CI",
+      "billboard_text": "[SOVEREIGN-CANARY] DMCA lifecycle; /integrity endpoint; Atom feed; log verify CI",
+      "coordinates_5d": {
+        "col": 98,
+        "row": 0,
+        "layer": 10,
+        "time": 0,
+        "domain": 2
+      },
+      "rendered_at": "2026-07-21T20:55:40.712950+00:00",
+      "provenance": "SEC #17684-273-411-436"
+    }
+  ],
+  "sec_env": {
+    "source_repo": "albert-lane-org/government",
+    "pipeline": "government \u2192 roadmaps \u2192 simcity",
+    "forensic_modules": [
+      "network_visualizer",
+      "irs_tracker",
+      "ftc_auditor",
+      "evidence_ledger",
+      "water_utilities",
+      "permit_system",
+      "logistics_portal",
+      "employment_system"
+    ]
+  },
+  "macrohard_teasers": {
+    "procurement_sample": {
+      "tool": "lane_procurement_pull",
+      "source": "albert-lane-org/procurement",
+      "preview": "Permit pipeline \u00b7 EV ledger \u00b7 Vendor reliability"
+    },
+    "maps_sample": {
+      "tool": "lane_maps_contours",
+      "source": "albert-lane-org/maps",
+      "preview": "Oregon terrain lattice \u00b7 Elevation DEM \u00b7 Watershed"
+    }
+  }
+}
