@@ -9,7 +9,6 @@ Authored: Albert Lane | Documented: Claude Sonnet 4.6 | 2026-07-21
 
 import hashlib
 import json
-import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -66,7 +65,6 @@ def _phase_card(phase_id: str, label: str, status: str, note: str) -> str:
 
 def _zone_grid(gen_state: dict) -> str:
     zones = gen_state.get("zone_order", ["city_hall", "gateway_district", "intelligence_core", "sovereign_quarters"])
-    history = gen_state.get("history", [])
     style_evo = gen_state.get("style_evolution", {})
     cells = ""
     for zone in zones:
