@@ -1,0 +1,142 @@
+# Authored: Albert Lane | Rendered: Claude Sonnet 4.6 | 2026-07-20 | SEC Whistleblower No. 17684-273-411-436 | This header must be preserved in any copy, fork, or derivative use
+name: Web Deploy — SimCity → albertlane.org/SimCity
+
+# Fires after the hourly creative engine completes.
+# Also fires on direct push to main (so site stays live on content updates).
+# Deploys site/ to Cloudflare Pages at albertlane.org/SimCity.
+#
+# REQUIRES:
+#   CLAUDE_API_KEY           — for hero copy generation in web_generator.py
+#   CF_API_TOKEN             — Cloudflare Pages deployment token
+#   CF_ACCOUNT_ID            — Cloudflare account ID
+#   SOVEREIGN_CANARY_URL     — (optional) Sovereign Canary beacon server
+#   SOVEREIGN_CANARY_SECRET  — (optional) token signing secret
+#
+# AUTHORED: Albert Lane | SovereignAudits™ | albertlane.net
+# SEC Whistleblower No. 17684-273-411-436
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'generation_state.json'
+      - 'visual_quality_state.json'
+      - 'assets/svg/**'
+      - 'updates/latest.json'
+      - 'marketing_state.json'
+      - 'canary_state.json'
+  workflow_dispatch:
+    inputs:
+      force_rebuild:
+        description: 'Force full site rebuild even if no state changed'
+        required: false
+        default: 'false'
+  repository_dispatch:
+    types: [creative-complete, marketing-complete, canary-update]
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies
+        run: pip install anthropic --quiet
+
+      - name: Run Sovereign Canary probe
+        id: canary
+        env:
+          SOVEREIGN_CANARY_URL:    ${{ secrets.SOVEREIGN_CANARY_URL }}
+          SOVEREIGN_CANARY_SECRET: ${{ secrets.SOVEREIGN_CANARY_SECRET }}
+        run: python3 .github/scripts/canary_probe.py
+
+      - name: Run marketing engine
+        id: marketing
+        env:
+          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+        run: python3 .github/scripts/marketing_engine.py
+
+      - name: Build Channel-1-News content
+        id: channel1
+        run: python3 .github/scripts/channel1_sync.py
+
+      - name: Generate site
+        id: webgen
+        env:
+          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+        run: python3 .github/scripts/web_generator.py
+
+      - name: Deploy to Cloudflare Pages
+        if: steps.webgen.outputs.build_hash != ''
+        uses: cloudflare/pages-action@f0a1cd58cd66095dee69bfa18fa5efd1dde93bca  # v1.5.0
+        with:
+          apiToken:    ${{ secrets.CF_API_TOKEN }}
+          accountId:   ${{ secrets.CF_ACCOUNT_ID }}
+          projectName: albertlane-simcity
+          directory:   site
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          branch:      main
+
+      - name: Commit updated state
+        run: |
+          git config user.email "web-deploy@sovereignaudits.bot"
+          git config user.name  "SimCity Web Deploy"
+          git add \
+            marketing_state.json \
+            canary_state.json \
+            MARKETING_LOG.md \
+            CANARY_LOG.md \
+            site/ \
+            || true
+          git diff --cached --quiet \
+            && echo "[web-deploy] Nothing changed — skipping commit." \
+            && exit 0
+          git commit -m \
+            "web-deploy: iter=${{ steps.webgen.outputs.iteration }} build=${{ steps.webgen.outputs.build_hash }} [auto]"
+          git push origin main || echo "[web-deploy] Push blocked — queued for next merge." >&2
+
+      - name: Report deployment failure
+        if: failure()
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
+        with:
+          script: |
+            const title = "[pipeline-failure] Web deploy failing";
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              labels: "pipeline-failure",
+              state:  "open",
+            });
+            const open = existing.data.find(i => i.title === title);
+            const entry = [
+              `**Run:** [Actions log](../../actions/runs/${context.runId})`,
+              `*${new Date().toISOString()}*`,
+            ].join("\n");
+            if (open) {
+              await github.rest.issues.createComment({
+                owner:        context.repo.owner,
+                repo:         context.repo.repo,
+                issue_number: open.number,
+                body:         entry,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner:  context.repo.owner,
+                repo:   context.repo.repo,
+                title,
+                labels: ["pipeline-failure"],
+                body: `### Web Deploy Failure\n\n${entry}\n\n---\n*Albert Lane | SovereignAudits™ | SEC Ref: 17684-273-411-436*`,
+              });
+            }

@@ -1,0 +1,77 @@
+# Authored: Albert Lane | Rendered: Claude Sonnet 4.6 | 2026-07-20 | SEC Whistleblower No. 17684-273-411-436 | This header must be preserved in any copy, fork, or derivative use
+name: Skill Improvement — Self-Referential Script Enhancement
+
+# Extends self-improve-creative.yml to also improve the new marketing/web/canary scripts.
+# Runs weekly on Sundays at 07:00 UTC (after style_evolution.py at 06:00).
+#
+# TARGET ROTATION (auto, override via skill_target input):
+#   web_generator    → if site SVG embed or build issues
+#   marketing_engine → if reach score low or A/B stagnant
+#   canary_probe     → if trigger rate < 10% after >=15 tokens
+#   channel1_sync    → rotating maintenance
+#
+# REQUIRES: CLAUDE_API_KEY
+#
+# AUTHORED: Albert Lane | SovereignAudits™ | albertlane.net
+# SEC Whistleblower No. 17684-273-411-436
+
+on:
+  schedule:
+    - cron: '0 7 * * 0'   # Sunday 07:00 UTC, after style_evolution at 06:00
+  workflow_dispatch:
+    inputs:
+      skill_target:
+        description: 'Target script: web_generator | marketing_engine | canary_probe | channel1_sync | auto'
+        required: false
+        default: 'auto'
+
+permissions:
+  contents: write
+
+jobs:
+  improve-skills:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install anthropic --quiet
+
+      - name: Run skill improver
+        id: improve
+        env:
+          CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+          SKILL_TARGET:   ${{ github.event.inputs.skill_target || 'auto' }}
+        run: python3 .github/scripts/skill_improver.py
+
+      - name: Commit improved scripts
+        if: steps.improve.outputs.patched == 'true'
+        run: |
+          git config user.email "skill-improver@sovereignaudits.bot"
+          git config user.name  "SimCity Skill Improver"
+          git add \
+            .github/scripts/ \
+            SKILL_IMPROVEMENT_LOG.md \
+            || true
+          git diff --cached --quiet \
+            && echo "[skill-improvement] Nothing to commit." \
+            && exit 0
+          git commit -m \
+            "skill-improve: ${{ steps.improve.outputs.target_script }} — ${{ steps.improve.outputs.improvement_target }} risk=${{ steps.improve.outputs.risk }} [auto]"
+          git push origin main || echo "[skill-improvement] Push blocked." >&2
+
+      - name: Summarize
+        run: |
+          echo "Target script: ${{ steps.improve.outputs.target_script }}"
+          echo "Improvement:   ${{ steps.improve.outputs.improvement_target }}"
+          echo "Risk level:    ${{ steps.improve.outputs.risk }}"
+          echo "Patch applied: ${{ steps.improve.outputs.patched }}"
