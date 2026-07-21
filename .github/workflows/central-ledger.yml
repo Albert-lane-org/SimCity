@@ -46,9 +46,7 @@ jobs:
           git add ledger/chain.jsonl ledger/index.json
           if ! git diff --cached --quiet; then
             git pull --rebase origin main --quiet || true
-            git commit -m "ledger: node push seq=${{ steps.append.outputs.seq }} node=${{ steps.append.outputs.node_id }} [auto]
-
-Co-authored-by: Claude Sonnet 4.6 <claude@anthropic.com>"
+            git commit -m "$(printf 'ledger: node push seq=${{ steps.append.outputs.seq }} node=${{ steps.append.outputs.node_id }} [auto]\n\nCo-authored-by: Claude Sonnet 4.6 <claude@anthropic.com>')"
             git push origin main || echo "[central-ledger] Push deferred — seating audit will resync on next poll"
           else
             echo "[central-ledger] No ledger changes to commit"

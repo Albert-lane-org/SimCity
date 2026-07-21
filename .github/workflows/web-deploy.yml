@@ -12,6 +12,10 @@ name: Web Deploy — SimCity → albertlane.org/SimCity
 #   SOVEREIGN_CANARY_URL     — (optional) Sovereign Canary beacon server
 #   SOVEREIGN_CANARY_SECRET  — (optional) token signing secret
 #
+# USES only GitHub-owned actions (actions/checkout, actions/setup-python).
+# Cloudflare deploy uses npx wrangler (npm, pre-installed on ubuntu-latest).
+# Failure reporting uses Python stdlib urllib — no github-script required.
+#
 # AUTHORED: Albert Lane | SovereignAudits™ | albertlane.net
 # SEC Whistleblower No. 17684-273-411-436
 
@@ -36,6 +40,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   build-and-deploy:
@@ -80,14 +85,19 @@ jobs:
 
       - name: Deploy to Cloudflare Pages
         if: steps.webgen.outputs.build_hash != ''
-        uses: cloudflare/pages-action@f0a1cd58cd66095dee69bfa18fa5efd1dde93bca  # v1.5.0
-        with:
-          apiToken:    ${{ secrets.CF_API_TOKEN }}
-          accountId:   ${{ secrets.CF_ACCOUNT_ID }}
-          projectName: albertlane-simcity
-          directory:   site
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          branch:      main
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "[deploy] CF_API_TOKEN or CF_ACCOUNT_ID not set — site built to site/ as fallback"
+            exit 0
+          fi
+          npm install -g wrangler@3 --silent
+          wrangler pages deploy site/ \
+            --project-name=albertlane-simcity \
+            --branch=main \
+            --commit-dirty=true
 
       - name: Commit updated state
         run: |
@@ -109,34 +119,52 @@ jobs:
 
       - name: Report deployment failure
         if: failure()
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea  # v7.0.1
-        with:
-          script: |
-            const title = "[pipeline-failure] Web deploy failing";
-            const existing = await github.rest.issues.listForRepo({
-              owner: context.repo.owner,
-              repo:  context.repo.repo,
-              labels: "pipeline-failure",
-              state:  "open",
-            });
-            const open = existing.data.find(i => i.title === title);
-            const entry = [
-              `**Run:** [Actions log](../../actions/runs/${context.runId})`,
-              `*${new Date().toISOString()}*`,
-            ].join("\n");
-            if (open) {
-              await github.rest.issues.createComment({
-                owner:        context.repo.owner,
-                repo:         context.repo.repo,
-                issue_number: open.number,
-                body:         entry,
-              });
-            } else {
-              await github.rest.issues.create({
-                owner:  context.repo.owner,
-                repo:   context.repo.repo,
-                title,
-                labels: ["pipeline-failure"],
-                body: `### Web Deploy Failure\n\n${entry}\n\n---\n*Albert Lane | SovereignAudits™ | SEC Ref: 17684-273-411-436*`,
-              });
-            }
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 - <<'PYEOF'
+          import os, json, urllib.request, urllib.error, datetime
+
+          token   = os.environ.get("GH_TOKEN", "")
+          repo    = os.environ.get("GITHUB_REPOSITORY", "")
+          run_id  = os.environ.get("GITHUB_RUN_ID", "")
+
+          if not token or not repo:
+              print("[report-failure] No token or repo — skipping")
+              raise SystemExit(0)
+
+          title    = "[pipeline-failure] Web deploy failing"
+          base_url = f"https://api.github.com/repos/{repo}"
+          headers  = {
+              "Authorization":        f"Bearer {token}",
+              "Accept":               "application/vnd.github+json",
+              "Content-Type":         "application/json",
+              "X-GitHub-Api-Version": "2022-11-28",
+          }
+          entry = (
+              f"**Run:** [Actions log](../../actions/runs/{run_id})\n"
+              f"*{datetime.datetime.utcnow().isoformat()}Z*"
+          )
+
+          def gh(method, path, data=None):
+              body = json.dumps(data).encode() if data else None
+              req  = urllib.request.Request(f"{base_url}{path}", data=body, headers=headers, method=method)
+              with urllib.request.urlopen(req) as r:
+                  return json.loads(r.read())
+
+          try:
+              issues     = gh("GET", "/issues?labels=pipeline-failure&state=open&per_page=20")
+              open_issue = next((i for i in issues if i["title"] == title), None)
+              if open_issue:
+                  gh("POST", f"/issues/{open_issue['number']}/comments", {"body": entry})
+                  print(f"[report-failure] Appended to issue #{open_issue['number']}")
+              else:
+                  body = (
+                      f"### Web Deploy Failure\n\n{entry}\n\n"
+                      "---\n*Albert Lane | SovereignAudits™ | SEC Ref: 17684-273-411-436*"
+                  )
+                  ni = gh("POST", "/issues", {"title": title, "labels": ["pipeline-failure"], "body": body})
+                  print(f"[report-failure] Created issue #{ni['number']}")
+          except Exception as e:
+              print(f"[report-failure] Warning: {e}")
+          PYEOF
