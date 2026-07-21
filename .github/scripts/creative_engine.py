@@ -656,6 +656,11 @@ def main():
         print("[main] CLAUDE_API_KEY not configured — skipping this run")
         sys.exit(0)
 
+    if GEN_STATE.exists():
+        age = datetime.datetime.utcnow().timestamp() - GEN_STATE.stat().st_mtime
+        if age > 4 * 3600:
+            print(f"[STALL] generation_state.json is {age/3600:.1f}h old — pipeline may be stalled", flush=True)
+
     zone_data, gen_state = load_state()
     quality_state        = load_quality_state()
     zone_key             = next_zone(gen_state)

@@ -14,6 +14,21 @@ SimCity is the public window into a private infrastructure project. It:
 
 ---
 
+## ACT-009 — CI BLOCKER (Owner Action Required)
+
+All estate CI — including SimCity's `hourly-creative.yml` — is blocked until the org admin resolves this:
+
+```
+github.com/orgs/albert-lane-org → Settings → Actions → General
+→ "Allow actions created by GitHub and specify allowed third-party actions"
+→ Allowlist (paste exactly):
+  actions/checkout,actions/setup-python,actions/setup-node,actions/upload-artifact,actions/github-script
+```
+
+This single org-level change unblocks SimCity, Channel-1-News, IP-Forensics, Sovereign-Canary, and all other estate CI simultaneously. No code change needed — this is a GitHub org admin settings change only.
+
+---
+
 ## CRITICAL: Read This Before Assuming Anything Is Broken
 
 This file was stale for weeks and claimed the opposite of the truth about
