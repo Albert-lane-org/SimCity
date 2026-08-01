@@ -23,7 +23,7 @@ on:
         required: false
         default: ''
   repository_dispatch:
-    types: [daily-routine, claude-api-routine]
+    types: [daily-routine, claude-api-routine, sovereign-signal]
 
 permissions:
   contents: write
