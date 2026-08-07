@@ -1,0 +1,14 @@
+{
+  "version": "https://jsonfeed.org/version/1.1",
+  "title": "Channel-1-News \u00b7 Albert Lane Estate",
+  "home_page_url": "https://albertlane.org/channel-1-news/",
+  "feed_url": "https://albertlane.org/channel-1-news/feed.json",
+  "description": "Sovereign news mesh \u2014 Albert Lane Estate creative pipeline",
+  "authors": [
+    {
+      "name": "Albert Lane",
+      "url": "https://albertlane.net"
+    }
+  ],
+  "items": []
+}
