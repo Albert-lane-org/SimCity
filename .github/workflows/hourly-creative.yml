@@ -74,6 +74,11 @@ jobs:
         if: steps.engine.outputs.svg_path != ''
         run: python3 .github/scripts/provenance_bridge.py
 
+      - name: Sync Channel-1-News static site
+        id: channel1
+        if: steps.engine.outputs.svg_path != ''
+        run: python3 .github/scripts/channel1_sync.py
+
       - name: Commit outputs
         if: steps.engine.outputs.svg_path != ''
         run: |
@@ -87,7 +92,8 @@ jobs:
             generation_state.json \
             visual_quality_state.json \
             ASSETS_FINGERPRINT.json \
-            ASSETS_FINGERPRINT.md
+            ASSETS_FINGERPRINT.md \
+            site/channel-1-news/
           git diff --cached --quiet \
             && echo "[commit] Nothing changed -- skipping." \
             && exit 0
