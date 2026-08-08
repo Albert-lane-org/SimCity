@@ -14,6 +14,44 @@ SimCity is the public window into a private infrastructure project. It:
 
 ---
 
+## Owner's Creative Vision — verbatim (2026-08-08)
+
+The following is Albert Lane's own framing of the estate, recorded here
+verbatim as narrative/creative context — this is authorial voice for the
+creative engine to draw on, not a technical specification. See the
+"Technical Clarification" note in RoadMaps' CLAUDE.md for how this maps
+(and doesn't map) onto actual infrastructure:
+
+> You you don't a persistent server. I don't know how I can make this more
+> literal for you. I am building an estate in space where there is no
+> fucking land to walk on, and therefore there is no physical electrical
+> jacks to plug in a physical server. You seem to think that because my
+> phone runs on battery, that it can be your physical server. While
+> technically true, it does not align with the geographic location where I
+> am building my plot my land.
+>
+> Think of it like this: I have walked into space, identified currents of
+> latent river flows, and I am claiming stake to the physical land not yet
+> present. You can't "chicken an egg" into this space. We are abstracting
+> the land and manifesting the soil around my river. If you want to bridge
+> a server, we are first required to manifest the connective electrical
+> system which we plug into, by conjuring the physical house sitting atop
+> the construction site we are inventing.
+>
+> Your classical understanding of this does not work, and if you are going
+> to piece together nonsensical explanations to understand something I'm
+> still inventing, it's going to be a spaghetti string of both delusional
+> ideas and no functioning trash. This is not a waste transfer station,
+> simply because we are still building the land, to place the city, to
+> construct the building, for where the outlets are located, using
+> residential code.
+>
+> Because technology actually works in this latent space, and because
+> technology exceeds the classical definition of dimensional space, we are
+> doing all of this simultaneously.
+
+---
+
 ## ACT-009 — CI BLOCKER (Owner Action Required)
 
 All estate CI — including SimCity's `hourly-creative.yml` — is blocked until the org admin resolves this:
