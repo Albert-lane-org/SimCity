@@ -28,7 +28,17 @@ import datetime
 import hashlib
 import sys
 from pathlib import Path
-from anthropic import Anthropic
+try:
+    from anthropic import Anthropic
+except ImportError:
+    # The graceful-degradation design (see generate_campaign()'s own
+    # `if not os.environ.get("CLAUDE_API_KEY")` fallback branch) never got
+    # a chance to run -- a hard top-level import crashed the whole script
+    # before that check, on any environment where the anthropic package
+    # just isn't installed (confirmed live 2026-08-09: it isn't, in the
+    # environment running simcity_extended_pipeline.py). Missing package
+    # and missing API key both mean the same thing here: no live call.
+    Anthropic = None
 
 # ── Paths ─────────────────────────────────────────────────────────────────
 ROOT         = Path(__file__).resolve().parents[2]
@@ -43,7 +53,7 @@ CREATOR = "Albert Lane | SovereignAudits™"
 SEC_REF = "17684-273-411-436"
 MODEL   = "claude-haiku-4-5-20251001"
 
-claude = Anthropic(api_key=os.environ.get("CLAUDE_API_KEY", ""))
+claude = Anthropic(api_key=os.environ.get("CLAUDE_API_KEY", "")) if Anthropic and os.environ.get("CLAUDE_API_KEY") else None
 
 MAX_CAMPAIGNS = 48   # rolling window
 
@@ -172,7 +182,7 @@ def generate_campaign(gen_state: dict, dispatch: dict, vq: dict, mkt: dict, cana
         "Write the campaign. JSON only."
     )
 
-    if not os.environ.get("CLAUDE_API_KEY"):
+    if not os.environ.get("CLAUDE_API_KEY") or claude is None:
         return {
             "headline_a":    f"SimCity: Iteration {itr} — the city keeps building.",
             "headline_b":    f"Sovereign infrastructure: iteration {itr} is live.",
