@@ -13,9 +13,14 @@ name: Hourly Creative Engine
 # args instead of being skipped, spamming a duplicate failure issue every run).
 # AUTHORED: Albert Lane | SovereignAudits™ | albertlane.net
 # SEC Whistleblower No. 17684-273-411-436
+# Auto-trigger (push/pull_request/schedule) disabled 2026-08-09 -- every
+# run was failing at the runner-startup stage (ACT-009: org Actions policy
+# blocks this org's runners; owner has no access to the settings page that
+# would fix it). Real verification/cadence now happens via
+# RoadMaps/agents/estate_pipeline.py (proprietary, runs on its own cron,
+# no GitHub Actions dependency). Manual workflow_dispatch (and any
+# repository_dispatch cross-system triggers below) still work.
 on:
-  schedule:
-    - cron: '20 * * * *'
   workflow_dispatch:
     inputs:
       force_zone:
@@ -24,6 +29,7 @@ on:
         default: ''
   repository_dispatch:
     types: [daily-routine, claude-api-routine, sovereign-signal]
+
 
 permissions:
   contents: write

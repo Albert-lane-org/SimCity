@@ -16,15 +16,21 @@
 
 name: Auto-Rebase Open PRs
 
+# Auto-trigger (push/pull_request/schedule) disabled 2026-08-09 -- every
+# run was failing at the runner-startup stage (ACT-009: org Actions policy
+# blocks this org's runners; owner has no access to the settings page that
+# would fix it). Real verification/cadence now happens via
+# RoadMaps/agents/estate_pipeline.py (proprietary, runs on its own cron,
+# no GitHub Actions dependency). Manual workflow_dispatch (and any
+# repository_dispatch cross-system triggers below) still work.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
     inputs:
       dry_run:
         description: "Detect diverged branches only — do not push"
         required: false
         default: "false"
+
 
 permissions:
   contents: write
