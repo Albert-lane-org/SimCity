@@ -1,12 +1,47 @@
 {
-  "tokens": [],
+  "tokens": [
+    {
+      "token": "SC-ae01335f10a8f1bd-MKT-0",
+      "type": "marketing_article",
+      "context": "Channel-1-News article for iteration 0",
+      "iteration": 0,
+      "generated": "2026-08-09T23:39:36Z",
+      "triggered": false,
+      "trigger_ts": null,
+      "trigger_domain": null,
+      "registered": true
+    },
+    {
+      "token": "SC-2be980eabec8cef5-SITE-0",
+      "type": "site_page",
+      "context": "albertlane.org/SimCity page view, iteration 0",
+      "iteration": 0,
+      "generated": "2026-08-09T23:39:36Z",
+      "triggered": false,
+      "trigger_ts": null,
+      "trigger_domain": null,
+      "registered": true
+    },
+    {
+      "token": "SC-7a26d507a95027b8-SVG-0",
+      "type": "svg_hotlink",
+      "context": "SVG asset None iteration 0",
+      "iteration": 0,
+      "zone": null,
+      "generated": "2026-08-09T23:39:36Z",
+      "triggered": false,
+      "trigger_ts": null,
+      "trigger_domain": null,
+      "registered": true
+    }
+  ],
   "triggered": [],
   "reach_score": 0.0,
   "domains_seen": [],
   "incidents": [],
-  "last_cycle": null,
+  "last_cycle": "2026-08-09T23:39:36Z",
   "_meta": {
-    "authored_by": "Albert Lane | SovereignAudits™",
+    "authored_by": "Albert Lane | SovereignAudits\u2122",
     "sec_ref": "17684-273-411-436",
     "schema_version": "1.0",
     "description": "Sovereign Canary token registry and reach measurement state. Managed by canary_probe.py. Feeds reach_score back into marketing_engine.py each cycle.",
