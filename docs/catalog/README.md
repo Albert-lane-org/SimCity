@@ -1,13 +1,16 @@
 #### Canonical Revision 1.1.0
 
-> **Latest edition:** [`deliverable-catalog-2026-08-09-v2.html`](deliverable-catalog-2026-08-09-v2.html) — a
-> full visual redesign, not a reformat. Replaces the second edition's light paper/swatch-grid layout with a
-> dark, monospace design system carried over from the estate's own MacroHard 3D Planner UI: a real inline-SVG
-> architecture diagram in place of decorative squares, a live repository directory table, and a terminal-style
-> log of this cycle's actual pipeline output. Content is current as of 2026-08-09 (15 repositories, real
-> per-repo CI status from the Estate Pipeline's last run, the newly-merged Business Plan pipeline and SimCity
-> Extended Pipeline work). [`deliverable-catalog-2026-08-09.html`](deliverable-catalog-2026-08-09.html) (second
-> edition) and the original document below are retained unchanged.
+> **Latest edition:** [`deliverable-catalog-2026-08-09-v3.html`](deliverable-catalog-2026-08-09-v3.html) — a
+> fourth edition, per owner direction reverting to the original document's exact print-page layout (rejected
+> the third edition's dark/mono redesign) with content updated to the estate's current state: 14 catalogued
+> repositories (government, finance-slack-other, and the Froi-Browser device-key gate added since the third
+> edition), a real GitHub-Actions-independent 8-stage pipeline, and two new novel-design-system entries (the
+> append-only versioned business-plan fact model, and the estate pipeline itself). The illustration/visual
+> design is deliberately untouched from the original — only content changed.
+>
+> [`deliverable-catalog-2026-08-09-v2.html`](deliverable-catalog-2026-08-09-v2.html) (third edition, dark/mono
+> redesign), [`deliverable-catalog-2026-08-09.html`](deliverable-catalog-2026-08-09.html) (second edition), and
+> the original document below are all retained unchanged.
 
 
 ## ATTN & Hello: 

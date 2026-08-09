@@ -42,7 +42,13 @@ import sys
 import json
 import datetime
 from pathlib import Path
-from anthropic import Anthropic
+try:
+    from anthropic import Anthropic
+except ImportError:
+    # See marketing_engine.py's identical fix for why: a hard top-level
+    # import previously crashed this script before its own CLAUDE_API_KEY
+    # graceful-skip check (in propose_improvement()) ever ran.
+    Anthropic = None
 
 # ── Paths ─────────────────────────────────────────────────────────────────
 ROOT         = Path(__file__).resolve().parents[2]
@@ -64,7 +70,7 @@ CREATOR = "Albert Lane | SovereignAudits™"
 SEC_REF = "17684-273-411-436"
 MODEL   = "claude-sonnet-4-6"
 
-client = Anthropic(api_key=os.environ.get("CLAUDE_API_KEY", ""))
+client = Anthropic(api_key=os.environ.get("CLAUDE_API_KEY", "")) if Anthropic and os.environ.get("CLAUDE_API_KEY") else None
 
 
 def load_json(path: Path, default: dict) -> dict:
@@ -230,8 +236,8 @@ def propose_improvement(target: str) -> bool:
         "Propose one improvement. Output format as specified."
     )
 
-    if not os.environ.get("CLAUDE_API_KEY"):
-        print("[skill_improver] No CLAUDE_API_KEY — skipping improvement.")
+    if not os.environ.get("CLAUDE_API_KEY") or client is None:
+        print("[skill_improver] No CLAUDE_API_KEY (or anthropic package unavailable) — skipping improvement.")
         return False
 
     resp = client.messages.create(

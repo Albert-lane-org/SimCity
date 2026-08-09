@@ -23,7 +23,13 @@ import datetime
 import hashlib
 import shutil
 from pathlib import Path
-from anthropic import Anthropic
+try:
+    from anthropic import Anthropic
+except ImportError:
+    # See marketing_engine.py's identical fix for why: a hard top-level
+    # import previously crashed this script before its own CLAUDE_API_KEY
+    # graceful-skip check ever ran.
+    Anthropic = None
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 ROOT         = Path(__file__).resolve().parents[2]
@@ -53,7 +59,7 @@ CREATOR  = "Albert Lane | SovereignAudits™"
 SEC_REF  = "17684-273-411-436"
 MODEL    = "claude-sonnet-4-6"
 
-claude = Anthropic(api_key=os.environ.get("CLAUDE_API_KEY", ""))
+claude = Anthropic(api_key=os.environ.get("CLAUDE_API_KEY", "")) if Anthropic and os.environ.get("CLAUDE_API_KEY") else None
 
 
 # ── State loaders ─────────────────────────────────────────────────────────────
@@ -123,7 +129,7 @@ def collect_svgs() -> list[dict]:
 
 def generate_hero_copy(gen_state: dict, dispatch: dict) -> dict:
     """Use Claude Sonnet to write fresh hero copy for the site."""
-    if not os.environ.get("CLAUDE_API_KEY"):
+    if not os.environ.get("CLAUDE_API_KEY") or claude is None:
         return {
             "headline":    "A civic infrastructure project, built in public.",
             "subhead":     "SimCity is the public face of the Albert Lane Digital Estate.",

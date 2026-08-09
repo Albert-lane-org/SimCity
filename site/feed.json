@@ -1,0 +1,51 @@
+{
+  "feed_version": "1.0",
+  "generated": "2026-08-09T23:55:14Z",
+  "source": "SimCity \u00b7 Albert Lane Digital Estate",
+  "author": "Albert Lane | SovereignAudits\u2122",
+  "sec_ref": "17684-273-411-436",
+  "iteration": 0,
+  "city_signal": "Walls rise. The blueprint holds.",
+  "momentum": "steady",
+  "headline": "SimCity: Iteration 0 \u2014 the city keeps building.",
+  "reach_score": 0.0,
+  "latest_zone": null,
+  "latest_svg_url": "https://raw.githubusercontent.com/Albert-lane-org/SimCity/main/",
+  "site_url": "https://albertlane.org/SimCity",
+  "gallery_url": "https://albertlane.org/SimCity/gallery.html",
+  "zones": [
+    {
+      "zone": "City Hall",
+      "layer": "navigation",
+      "description": "Coordination and navigation hub",
+      "active_phase": "Foundation",
+      "completion": 100,
+      "status": "operational"
+    },
+    {
+      "zone": "Gateway District",
+      "layer": "infrastructure",
+      "description": "Universal access layer \u2014 the city's programmatic exchange",
+      "active_phase": "Integration",
+      "completion": 60,
+      "status": "building"
+    },
+    {
+      "zone": "Intelligence Core",
+      "layer": "data",
+      "description": "XML-native knowledge pipeline \u2014 civic and registry memory",
+      "active_phase": "Integration",
+      "completion": 75,
+      "status": "building"
+    },
+    {
+      "zone": "Sovereign Quarters",
+      "layer": "interface",
+      "description": "Cryptographic identity browser \u2014 the citizen's interface",
+      "active_phase": "Integration",
+      "completion": 55,
+      "status": "building"
+    }
+  ],
+  "history_tail": []
+}
