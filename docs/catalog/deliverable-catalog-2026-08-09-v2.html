@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Albert Lane Digital Estate — Deliverable Catalog v2</title>
+<!--
+  Albert Lane Digital Estate — Deliverable Catalog, third edition
+  Authored: Albert Lane · albertlane.net
+  Documented: Claude Sonnet 5 (Anthropic)
+  Design system carried over from LaneEstate MacroHard 3D Planner (dark/mono/accent language),
+  rebuilt here for a scrolling document rather than an interactive tool.
+  SEC Whistleblower No. 17684-273-411-436
+-->
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0b10;--bg2:#0e0f18;--panel:#12131d;--panel2:#161826;
+  --border:#1c1e2c;--border2:#282b40;
+  --accent:#ff9f1c;--accent-dim:#a86a17;--teal:#00f5d4;--red:#e05a5a;--green:#52b788;
+  --text:#cdd0e0;--text-dim:#7a7ea0;--text-faint:#3c4058;
+  --mono:'IBM Plex Mono','SFMono-Regular','Courier New',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);line-height:1.65;font-size:14px}
+a{color:var(--teal)}
+::selection{background:var(--accent);color:#0a0b10}
+
+/* ── Top identity bar ─────────────────────────────────────── */
+#topbar{position:sticky;top:0;z-index:50;background:rgba(10,11,16,.92);backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--border);padding:10px 5vw;display:flex;align-items:center;gap:14px}
+#topbar .mark{font-weight:800;letter-spacing:4px;color:var(--accent);font-size:13px}
+#topbar .sep{width:1px;height:12px;background:var(--border2)}
+#topbar nav{display:flex;gap:16px;margin-left:4px;font-size:11px;color:var(--text-dim);flex-wrap:wrap}
+#topbar nav a{color:var(--text-dim);text-decoration:none;letter-spacing:.5px}
+#topbar nav a:hover{color:var(--accent)}
+#topbar .rev{margin-left:auto;font-size:10px;color:var(--text-faint);letter-spacing:1px;white-space:nowrap}
+
+/* ── Section shell ────────────────────────────────────────── */
+section{padding:64px 5vw;border-bottom:1px solid var(--border)}
+section.tight{padding:44px 5vw}
+.eyebrow{font-size:10px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.eyebrow::before{content:'';width:16px;height:1px;background:var(--accent)}
+h1{font-size:clamp(28px,4.5vw,52px);font-weight:800;letter-spacing:-.5px;line-height:1.08;color:#f2f3fb}
+h2{font-size:22px;font-weight:700;letter-spacing:-.2px;color:#eceefa;margin-bottom:6px}
+h3{font-size:14px;font-weight:700;color:var(--text);letter-spacing:.2px}
+p{color:var(--text-dim);max-width:74ch}
+.lede{font-size:16px;color:var(--text);max-width:64ch;margin-top:16px}
+.small{font-size:11px;color:var(--text-faint)}
+
+/* ── Hero ─────────────────────────────────────────────────── */
+#hero{padding-top:80px;position:relative;overflow:hidden}
+#hero::before{content:'';position:absolute;top:-120px;right:-80px;width:520px;height:520px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,159,28,.10),transparent 70%);pointer-events:none}
+.hero-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:48px;align-items:end}
+@media(max-width:900px){.hero-grid{grid-template-columns:1fr}}
+.stat-row{display:flex;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--panel)}
+.stat{flex:1;padding:16px 14px;border-right:1px solid var(--border)}
+.stat:last-child{border-right:none}
+.stat .n{font-size:26px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
+.stat .l{font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-faint);margin-top:4px}
+
+/* ── SVG diagram panel ────────────────────────────────────── */
+.diagram-panel{border:1px solid var(--border);border-radius:8px;background:var(--panel);padding:22px;margin-top:26px}
+.diagram-panel svg{width:100%;height:auto;display:block}
+.node-label{font-family:var(--mono);font-size:9.5px;fill:var(--text)}
+.node-sub{font-family:var(--mono);font-size:7.5px;fill:var(--text-faint)}
+.edge{stroke:var(--border2);stroke-width:1.3;fill:none}
+.edge.active{stroke:var(--accent);stroke-opacity:.55}
+.node-dot{filter:drop-shadow(0 0 4px currentColor)}
+
+/* ── Repo directory table ─────────────────────────────────── */
+.tbl{width:100%;border-collapse:collapse;margin-top:22px;font-size:12px}
+.tbl th{text-align:left;font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-faint);
+  padding:0 12px 10px;border-bottom:1px solid var(--border2);font-weight:600}
+.tbl td{padding:11px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+.tbl tr:hover td{background:rgba(255,159,28,.035)}
+.repo-name{color:#f0f2fb;font-weight:700}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px;position:relative;top:-1px}
+.dot.ok{background:var(--green);box-shadow:0 0 6px var(--green)}
+.dot.warn{background:var(--accent);box-shadow:0 0 6px var(--accent)}
+.dot.info{background:var(--teal);box-shadow:0 0 6px var(--teal)}
+.pill{display:inline-block;font-size:9.5px;letter-spacing:.5px;padding:2px 8px;border-radius:20px;border:1px solid var(--border2);color:var(--text-dim)}
+.tbl .cat{color:var(--text-faint);font-size:10.5px}
+
+/* ── Log / terminal blocks ────────────────────────────────── */
+.termhead{display:flex;align-items:center;gap:6px;padding:8px 12px;background:var(--panel2);border:1px solid var(--border);border-bottom:none;border-radius:7px 7px 0 0}
+.termhead i{width:8px;height:8px;border-radius:50%;background:var(--border2)}
+.termhead span{margin-left:6px;font-size:10px;color:var(--text-faint)}
+.term{background:#08090d;border:1px solid var(--border);border-top:none;border-radius:0 0 7px 7px;padding:16px 18px;font-size:11.5px;
+  color:#8fe3c7;overflow-x:auto;white-space:pre}
+.term .c{color:var(--text-faint)}
+.term .ok{color:var(--green)}
+.term .warn{color:var(--accent)}
+
+/* ── Two-column feature rows ──────────────────────────────── */
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1px;background:var(--border);
+  border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-top:26px}
+.feat{background:var(--panel);padding:20px 22px}
+.feat .idx{font-size:10px;color:var(--text-faint);letter-spacing:1px}
+.feat h3{margin:8px 0 8px}
+.feat p{font-size:12.5px}
+
+/* ── Timeline ──────────────────────────────────────────────── */
+.tl{position:relative;margin-top:28px;padding-left:22px;border-left:1px solid var(--border2)}
+.tl-item{position:relative;margin-bottom:20px}
+.tl-item::before{content:'';position:absolute;left:-27px;top:5px;width:9px;height:9px;border-radius:50%;background:var(--bg);border:2px solid var(--accent)}
+.tl-item .d{font-size:10px;color:var(--text-faint);letter-spacing:1px;margin-bottom:3px}
+.tl-item h3{font-size:13px}
+.tl-item p{font-size:12px;margin-top:3px}
+
+/* ── Footer ───────────────────────────────────────────────── */
+footer{padding:40px 5vw;font-size:10.5px;color:var(--text-faint);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+.k{color:var(--teal)}
+.acc{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <span class="mark">ALBERT LANE ESTATE</span>
+  <div class="sep"></div>
+  <nav>
+    <a href="#architecture">Architecture</a>
+    <a href="#repos">Repositories</a>
+    <a href="#cycle">This Cycle</a>
+    <a href="#pipeline">Pipeline</a>
+  </nav>
+  <span class="rev">CATALOG · REV 3 · 2026-08-09</span>
+</div>
+
+<!-- ══════════════════════════════════ HERO ══════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="eyebrow">Engineering Deliverable Catalog</div>
+      <h1>Fifteen repositories.<br>One estate, wired together.</h1>
+      <p class="lede">A sovereign digital infrastructure estate — gateway, storage, browser, screening,
+        and public-facing layers — built and verified against its own local test suites, independent of
+        GitHub Actions. This edition replaces the previous swatch-and-panel mockup layout with the estate's
+        actual working design language: dark, monospace, and driven by real data rather than placeholder boxes.</p>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="n">15</div><div class="l">Repositories</div></div>
+      <div class="stat"><div class="n">10/13</div><div class="l">CI-green, last cycle</div></div>
+      <div class="stat"><div class="n">31+</div><div class="l">lane-mcp MCP tools</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ ARCHITECTURE ══════════════════════════════════ -->
+<section id="architecture">
+  <div class="eyebrow">01 · Architecture</div>
+  <h2>How the estate actually connects</h2>
+  <p>SQLXML is the structural interconnection point. Every other layer — the browser, the analytics
+    workbook, the civic screening pipeline, the public site — reads and writes through it or through the
+    lane-mcp gateway sitting in front of it.</p>
+
+  <div class="diagram-panel">
+    <svg viewBox="0 0 960 320" xmlns="http://www.w3.org/2000/svg">
+      <!-- edges -->
+      <path class="edge active" d="M 480 60 L 480 120"/>
+      <path class="edge active" d="M 480 160 L 480 200"/>
+      <path class="edge" d="M 210 240 L 400 210"/>
+      <path class="edge" d="M 340 240 L 420 215"/>
+      <path class="edge" d="M 480 240 L 480 215"/>
+      <path class="edge" d="M 610 240 L 540 215"/>
+      <path class="edge" d="M 750 240 L 560 210"/>
+      <path class="edge" d="M 130 100 L 480 130"/>
+      <path class="edge" d="M 830 100 L 480 130"/>
+
+      <!-- lane-mcp gateway node -->
+      <circle cx="480" cy="90" r="26" fill="#12131d" stroke="var(--teal)" stroke-width="1.6" class="node-dot" style="color:var(--teal)"/>
+      <text x="480" y="86" text-anchor="middle" class="node-label" font-weight="700">lane-mcp</text>
+      <text x="480" y="98" text-anchor="middle" class="node-sub">gateway · 31+ tools</text>
+
+      <!-- sqlxml core node -->
+      <circle cx="480" cy="180" r="30" fill="#12131d" stroke="var(--accent)" stroke-width="1.8" class="node-dot" style="color:var(--accent)"/>
+      <text x="480" y="176" text-anchor="middle" class="node-label" font-weight="700">sqlxml</text>
+      <text x="480" y="188" text-anchor="middle" class="node-sub">structural core</text>
+
+      <!-- flanking: RoadMaps -->
+      <circle cx="130" cy="100" r="20" fill="#12131d" stroke="var(--border2)" stroke-width="1.4"/>
+      <text x="130" y="97" text-anchor="middle" class="node-label">RoadMaps</text>
+      <text x="130" y="108" text-anchor="middle" class="node-sub">estate pipeline</text>
+
+      <!-- flanking: Tauri-RustXML -->
+      <circle cx="830" cy="100" r="20" fill="#12131d" stroke="var(--border2)" stroke-width="1.4"/>
+      <text x="830" y="97" text-anchor="middle" class="node-label">Tauri-RustXML</text>
+      <text x="830" y="108" text-anchor="middle" class="node-sub">sovereign browser</text>
+
+      <!-- bottom row consumers -->
+      <circle cx="210" cy="248" r="17" fill="#12131d" stroke="var(--border2)" stroke-width="1.3"/>
+      <text x="210" y="278" text-anchor="middle" class="node-label">maps</text>
+
+      <circle cx="340" cy="248" r="17" fill="#12131d" stroke="var(--border2)" stroke-width="1.3"/>
+      <text x="340" y="278" text-anchor="middle" class="node-label">Procurement</text>
+
+      <circle cx="480" cy="248" r="17" fill="#12131d" stroke="var(--border2)" stroke-width="1.3"/>
+      <text x="480" y="278" text-anchor="middle" class="node-label">Government</text>
+
+      <circle cx="610" cy="248" r="17" fill="#12131d" stroke="var(--border2)" stroke-width="1.3"/>
+      <text x="610" y="278" text-anchor="middle" class="node-label">MacroHard</text>
+
+      <circle cx="750" cy="248" r="17" fill="#12131d" stroke="var(--border2)" stroke-width="1.3"/>
+      <text x="750" y="278" text-anchor="middle" class="node-label">SimCity</text>
+
+      <text x="480" y="312" text-anchor="middle" class="node-sub" font-size="8">MCP client layer — each node consumes lane-mcp's generic modules; none are wired into gateway code itself</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ REPO DIRECTORY ══════════════════════════════════ -->
+<section id="repos">
+  <div class="eyebrow">02 · Repository Directory</div>
+  <h2>Fifteen repositories, real phase status</h2>
+  <p>Status reflects each repository's own current-phase documentation and, where marked <span class="k">verified</span>,
+    an actual local build/test run from the Estate Pipeline's last cycle rather than a claimed number.</p>
+
+  <table class="tbl">
+    <thead><tr><th>Repository</th><th>Role</th><th>Current phase</th><th>CI (last cycle)</th></tr></thead>
+    <tbody>
+      <tr><td class="repo-name">lane-mcp</td><td class="cat">MCP gateway, 10 modules</td><td>Phase 15 — LaneVM module</td><td><span class="dot ok"></span>green</td></tr>
+      <tr><td class="repo-name">RoadMaps</td><td class="cat">Estate pipeline + business plan</td><td>Phase 17 — Sovereign Architecture</td><td><span class="dot warn"></span>uncommitted (in progress)</td></tr>
+      <tr><td class="repo-name">sqlxml</td><td class="cat">XML pipeline, critical path</td><td>Phase 8 — AR/VR storage layer</td><td><span class="dot ok"></span>green</td></tr>
+      <tr><td class="repo-name">Tauri-RustXML</td><td class="cat">Sovereign browser, NexusCore</td><td>Phase 9 — Froi-Browser retrofit (planned)</td><td><span class="dot ok"></span>green</td></tr>
+      <tr><td class="repo-name">maps</td><td class="cat">Terrain intelligence, MacroHard module #2</td><td>Phase 12 — Topographic analysis</td><td><span class="dot warn"></span>uncommitted (in progress)</td></tr>
+      <tr><td class="repo-name">Procurement</td><td class="cat">Delivery hub, MacroHard module #1</td><td>Phase 10 — Contract lifecycle</td><td><span class="dot ok"></span>green</td></tr>
+      <tr><td class="repo-name">IP-Forensics</td><td class="cat">IP infringement detection</td><td>Phase 14 — AST candidate scan</td><td><span class="dot warn"></span>uncommitted (in progress)</td></tr>
+      <tr><td class="repo-name">Sovereign-Canary</td><td class="cat">Violation log + reach beacon</td><td>Phase 11 — C-Stream + mesh hardening</td><td><span class="dot ok"></span>green</td></tr>
+      <tr><td class="repo-name">SimCity</td><td class="cat">Public creative updater · this document</td><td>Extended pipeline carried forward (PR #161)</td><td><span class="dot ok"></span>green</td></tr>
+      <tr><td class="repo-name">MacroHard</td><td class="cat">3D workbook, module host</td><td>Phase 14 — 5D model + lane-mcp cache</td><td><span class="dot ok"></span>green</td></tr>
+      <tr><td class="repo-name">Government</td><td class="cat">Civic intelligence screening</td><td>Phase 1 — Foundation wire-up</td><td><span class="dot ok"></span>green</td></tr>
+      <tr><td class="repo-name">Finance-Slack-Other</td><td class="cat">Self-hosted OC bridge</td><td>Phase 9 — Self-hosted OC bridge</td><td><span class="dot ok"></span>green</td></tr>
+      <tr><td class="repo-name">Channel-1-News</td><td class="cat">Sovereign news mesh</td><td>Phase 9 — SimCity integration</td><td><span class="dot ok"></span>green</td></tr>
+      <tr><td class="repo-name">Froi-Browser</td><td class="cat">Device-key gate, keystore</td><td>PR #4 merged — real BiometricPrompt gate</td><td><span class="pill">merged today</span></td></tr>
+      <tr><td class="repo-name">project_name_pending</td><td class="cat">Not yet scoped</td><td>—</td><td><span class="pill">deferred</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ══════════════════════════════════ THIS CYCLE ══════════════════════════════════ -->
+<section id="cycle" class="tight">
+  <div class="eyebrow">03 · This Cycle</div>
+  <h2>Work verified today, not carried over from memory</h2>
+
+  <div class="tl">
+    <div class="tl-item">
+      <div class="d">SIMCITY #155 → #161</div>
+      <h3>Extended pipeline audit + carry-forward</h3>
+      <p>Audited canary_probe.py, marketing_engine.py, web_generator.py for the hang the pipeline was
+        flagged for — every outbound call already carried a timeout, none found. Found and fixed a real
+        issue instead: skill_improver.py auto-applied LLM-proposed patches to sibling scripts with no
+        human review. Rebuilt to propose-only. Merged to main.</p>
+    </div>
+    <div class="tl-item">
+      <div class="d">ROADMAPS</div>
+      <h3>Business Plan pipeline, live-tested</h3>
+      <p>business-plan-pipeline.yml + schema implemented mechanically. First real run pulled
+        <span class="k">products_services</span> from actual CI data and left every other section exactly as
+        gapped as the schema's own known-gaps list says — nothing invented to fill a blank.</p>
+    </div>
+    <div class="tl-item">
+      <div class="d">SIMCITY #162</div>
+      <h3>Duplicate branch closed, not merged</h3>
+      <p>A reopen of #155's exact commit was closed rather than merged, since merging it would have
+        silently reintroduced the unreviewed auto-patch behavior #161 had just fixed.</p>
+    </div>
+    <div class="tl-item">
+      <div class="d">FROI-BROWSER #4</div>
+      <h3>Real Keystore + BiometricPrompt device gate</h3>
+      <p>Replaced a stub that computed <span class="k">TITAN_M_BOUND_{len}</span> and called it a hardware
+        identifier with an actual Android Keystore key requiring biometric auth, StrongBox-backed where
+        available. Merged.</p>
+    </div>
+  </div>
+
+  <div class="termhead"><i></i><i></i><i></i><span>estate_pipeline.py — last real run</span></div>
+  <div class="term">$ python3 agents/estate_pipeline.py
+<span class="c">[conflict_resolver]</span> 0 real conflicts across 15 repos
+<span class="c">[estate_ci]</span> 10/13 <span class="ok">green</span>, 3 skipped (uncommitted, not discarded)
+<span class="c">[dependable_bot]</span> OSV.dev + GitHub Advisory sweep complete
+<span class="c">[estate_merge]</span> readiness decisions logged, no auto-merge attempted
+<span class="c">[ip_forensics_scan]</span> live scan complete, 0 findings this cycle
+<span class="c">[simcity_extended_pipeline]</span> canary_probe → marketing_engine → web_generator run
+<span class="c">[roadmaps_data_compilation]</span> --check-cadence <span class="warn">first_run</span>: compiled
+<span class="c">[business_plan_pipeline]</span> --check-cadence <span class="warn">first_run</span>: 2 facts applied, 0 fabricated</div>
+</section>
+
+<!-- ══════════════════════════════════ PIPELINE ══════════════════════════════════ -->
+<section id="pipeline">
+  <div class="eyebrow">04 · GitHub-Actions-Independent Pipeline</div>
+  <h2>Built because ACT-009 has no owner-accessible fix</h2>
+  <p>The org-level Actions policy blocker has been open for weeks with no path for the owner to reach the
+    relevant Settings page. Rather than wait on it, the estate runs its own cadence: plain Python, real git,
+    real local build/test/lint, fired by a scheduled Routine — zero GitHub Actions dependency for the
+    decision layer.</p>
+
+  <div class="feat-grid">
+    <div class="feat"><div class="idx">01</div><h3>conflict_resolver.py</h3><p>Syncs feature branches against main. Real conflicts are flagged for judgment — never blind-resolved.</p></div>
+    <div class="feat"><div class="idx">02</div><h3>estate_ci.py</h3><p>Runs each repo's actual local build/test/lint and writes a real status file, not a claimed one.</p></div>
+    <div class="feat"><div class="idx">03</div><h3>dependable_bot.py</h3><p>OSV.dev + GitHub Advisory queries against each repo's real lock file.</p></div>
+    <div class="feat"><div class="idx">04</div><h3>estate_merge.py</h3><p>Decides <span class="k">ready_to_merge</span> vs <span class="k">skipped</span>. The actual merge click is a separate, human-present step — GitHub's own API reserves it.</p></div>
+    <div class="feat"><div class="idx">05</div><h3>ip_forensics_scan.py</h3><p>GitHub, Docker Hub, Hugging Face, npm, PyPI, crates.io, RubyGems, NuGet — against live infrastructure.</p></div>
+    <div class="feat"><div class="idx">06</div><h3>simcity_extended_pipeline.py</h3><p>Canary probe, marketing engine, web generator every cycle; skill improver proposals Sundays only.</p></div>
+    <div class="feat"><div class="idx">07</div><h3>roadmaps_data_compilation.py</h3><p>Feeds the business plan's product catalog from real CI output. Daily for a week, then every 72h, plus Sundays.</p></div>
+    <div class="feat"><div class="idx">08</div><h3>business_plan_pipeline.py</h3><p>Ingest → classify → merge → validate → archive. Publish is a separate, human-approved step it can never reach on its own.</p></div>
+  </div>
+</section>
+
+<footer>
+  <span>Authored: Albert Lane &nbsp;·&nbsp; albertlane.net &nbsp;·&nbsp; SEC Whistleblower No. 17684-273-411-436</span>
+  <span>Documented: Claude Sonnet 5 (Anthropic) &nbsp;·&nbsp; Third edition, 2026-08-09 &nbsp;·&nbsp; Prior editions retained unchanged</span>
+</footer>
+
+</body>
+</html>
