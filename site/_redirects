@@ -1,0 +1,3 @@
+/SimCity           /index.html    200
+/SimCity/*         /index.html    200
+/SimCity/gallery   /gallery.html  200
