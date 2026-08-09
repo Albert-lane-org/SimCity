@@ -1,6 +1,13 @@
 #### Canonical Revision 1.1.0
 
-> **Updated edition available:** [`deliverable-catalog-2026-08-09.html`](deliverable-catalog-2026-08-09.html) reflects the estate's current state (13 active repositories, live-verified IP-forensics tooling, the GitHub-Actions-independent estate pipeline, and the published Investor Priced Index framework). The original document below and `deliverable-catalog.html` are retained unchanged.
+> **Latest edition:** [`deliverable-catalog-2026-08-09-v2.html`](deliverable-catalog-2026-08-09-v2.html) — a
+> full visual redesign, not a reformat. Replaces the second edition's light paper/swatch-grid layout with a
+> dark, monospace design system carried over from the estate's own MacroHard 3D Planner UI: a real inline-SVG
+> architecture diagram in place of decorative squares, a live repository directory table, and a terminal-style
+> log of this cycle's actual pipeline output. Content is current as of 2026-08-09 (15 repositories, real
+> per-repo CI status from the Estate Pipeline's last run, the newly-merged Business Plan pipeline and SimCity
+> Extended Pipeline work). [`deliverable-catalog-2026-08-09.html`](deliverable-catalog-2026-08-09.html) (second
+> edition) and the original document below are retained unchanged.
 
 
 ## ATTN & Hello: 
