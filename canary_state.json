@@ -1,0 +1,19 @@
+{
+  "tokens": [],
+  "triggered": [],
+  "reach_score": 0.0,
+  "domains_seen": [],
+  "incidents": [],
+  "last_cycle": null,
+  "_meta": {
+    "authored_by": "Albert Lane | SovereignAudits™",
+    "sec_ref": "17684-273-411-436",
+    "schema_version": "1.0",
+    "description": "Sovereign Canary token registry and reach measurement state. Managed by canary_probe.py. Feeds reach_score back into marketing_engine.py each cycle.",
+    "token_taxonomy": {
+      "SC-{hash}-MKT-{iter}": "Marketing article beacon",
+      "SC-{hash}-SITE-{iter}": "Website page view beacon",
+      "SC-{hash}-SVG-{zone}-{iter}": "SVG asset hotlink probe"
+    }
+  }
+}
