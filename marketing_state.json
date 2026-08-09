@@ -1,0 +1,14 @@
+{
+  "campaigns": [],
+  "last_headline": "",
+  "reach_score": 0,
+  "self_critique": "First cycle — no prior campaign data.",
+  "ab_winner": "headline_a",
+  "iteration": 0,
+  "_meta": {
+    "authored_by": "Albert Lane | SovereignAudits™",
+    "sec_ref": "17684-273-411-436",
+    "schema_version": "1.0",
+    "description": "Recursive marketing campaign state. Read by marketing_engine.py each cycle. Rolling window of MAX_CAMPAIGNS=48 entries."
+  }
+}

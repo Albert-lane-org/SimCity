@@ -100,6 +100,37 @@ guards in the workflow) -- it does NOT crash, as of the 2026-07-05 fix.
 
 ---
 
+## Extended Pipeline — Web/Marketing/Canary/Skill-Improver (2026-08-09)
+
+Rebuilt from PR #155 (`feat(phase9): SimCity Extended Pipeline`) onto current
+`main` rather than merged as-is — see `README-EXTENDED.md` for the full
+"what changed and why" writeup, and PR #155's closing comment for the
+audit trail. Short version:
+
+- `.github/scripts/canary_probe.py`, `marketing_engine.py`, `web_generator.py`
+  are carried forward unchanged (all HTTP calls already had timeouts;
+  no hang risk found in audit).
+- `.github/scripts/skill_improver.py` was fixed: the original auto-applied
+  LLM-proposed patches straight to sibling scripts and relied on a workflow
+  step to auto-commit + push, with no human review. Rebuilt version writes
+  every proposal to `skill_improvement_proposals/*.diff.md` for human review
+  and **never writes to a target script itself**.
+- No new GitHub Actions workflow files were added (no `web-deploy.yml`
+  replacement, no `skill-improvement.yml`). `main`'s existing
+  `web-deploy.yml` is dispatch-only and narrower than what PR #155
+  proposed replacing it with; adding more `actions/*`-dependent automation
+  on top of the existing ACT-009 blocker (which the owner has no path to
+  resolve from GitHub's own Settings UI) would add scope no one can run.
+  These scripts are invoked instead by RoadMaps' GitHub-Actions-independent
+  cron pipeline — see RoadMaps `agents/estate_pipeline.py` and its SimCity
+  extended-pipeline stage.
+- `canary_state.json` / `marketing_state.json` ship with empty initial
+  state (no fabricated reach/campaign data).
+- `wrangler.simcity-site.toml` still has a placeholder KV namespace ID —
+  owner action, see table below.
+
+---
+
 ## Key Files (verify against actual repo state, not this table, if in doubt)
 
 | File | Purpose |
@@ -110,8 +141,15 @@ guards in the workflow) -- it does NOT crash, as of the 2026-07-05 fix.
 | `.github/scripts/creative_engine.py` | Main v3 engine -- narrative, SVG generation, README rendering |
 | `.github/scripts/quality_scorer.py` | Independent Claude Haiku review of Claude Sonnet's SVG output |
 | `.github/scripts/provenance_bridge.py` | Asset fingerprinting + safe public attribution injection |
+| `.github/scripts/canary_probe.py` | Sovereign Canary token generation + trigger polling + reach score |
+| `.github/scripts/marketing_engine.py` | Recursive Channel-1-News campaign generator, reads reach data |
+| `.github/scripts/web_generator.py` | Builds `site/` for albertlane.org/SimCity |
+| `.github/scripts/skill_improver.py` | Proposes (never auto-applies) one improvement/cycle to the above scripts |
 | `.github/workflows/hourly-creative.yml` | Hourly trigger at :20 past the hour |
 | `.github/workflows/autonomous-request.yml` | Daily 20:00 UTC -- opens design-request issues for sustained low-quality zones |
+| `.github/workflows/web-deploy.yml` | Dispatch-only (repository_dispatch/workflow_dispatch); builds `site/simcity/` |
+| `canary_state.json`, `marketing_state.json` | Extended-pipeline state — empty until a real cycle runs |
+| `skill_improvement_proposals/` | Human-review-required patch proposals from `skill_improver.py` |
 | `README.md`, `VISUAL_LOG.md`, `gallery.md` | Auto-generated public output — do not edit manually |
 
 ---
@@ -138,6 +176,12 @@ Set it at *Settings → Secrets and variables → Actions*.
 
 The `_ROADMAPS` secret lives in RoadMaps and is used by `simcity-dispatch.yml`
 to push `updates/latest.json` across repos. That token needs write access to SimCity.
+
+`SOVEREIGN_CANARY_URL` + `SOVEREIGN_CANARY_SECRET` (optional) activate live
+reach measurement in `canary_probe.py`; without them it runs in local mode
+(tokens generated, no polling, `reach_score` stays 0.0). `CLOUDFLARE_API_TOKEN`
++ `CLOUDFLARE_ACCOUNT_ID` are needed for the extended pipeline's Pages
+deployment — same owner-action blocker as every other Worker in the estate.
 
 ---
 

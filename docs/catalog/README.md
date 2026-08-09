@@ -1,5 +1,7 @@
 #### Canonical Revision 1.1.0
 
+> **Updated edition available:** [`deliverable-catalog-2026-08-09.html`](deliverable-catalog-2026-08-09.html) reflects the estate's current state (13 active repositories, live-verified IP-forensics tooling, the GitHub-Actions-independent estate pipeline, and the published Investor Priced Index framework). The original document below and `deliverable-catalog.html` are retained unchanged.
+
 
 ## ATTN & Hello: 
 Future and Current Investor of 'Albert Lane Digital to Physical Infrastructure Merger', henceforwardly known as "Albert Lane Digital Estate";
