@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Albert_Lane_Deliverable_Catalog_5D.pdf</title>
+<meta name="description" content="Professional catalog of the Albert Lane sovereign digital infrastructure estate: mission, repository catalog, novel engineering deliverables, and visual roadmap." />
+<style>
+  :root{
+    --ink:      #0A1628;
+    --surface:  #0D1F3C;
+    --surface2: #162944;
+    --border:   #1E3A5F;
+    --accent:   #00D4FF;
+    --accent-dk:#007A99;
+    --success:  #00C896;
+    --warn:     #FF6B35;
+    --danger:   #FF3860;
+    --text:     #14212F;
+    --text-dim: #4B6478;
+    --paper:    #FCFDFE;
+    --mono: 'Courier New', 'Consolas', monospace;
+    --sans: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html,body{
+    background:#e9edf1;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  body{
+    font-family:var(--sans);
+    color:var(--text);
+    font-size:11pt;
+    line-height:1.5;
+  }
+  
+  @page {
+    size: 8.5in 11in;
+    margin: 0;
+  }
+
+  /* PDF Print Control Bar */
+  #pdf-toolbar {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 9999;
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    padding: 10px 16px;
+    border-radius: 6px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  #pdf-toolbar button {
+    background: var(--accent);
+    color: var(--ink);
+    border: none;
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 10pt;
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+  }
+  #pdf-toolbar button:hover { background: #52e5ff; }
+  #pdf-toolbar span { font-family: var(--mono); font-size: 8.5pt; color: #E8F4FD; }
+
+  .page{
+    position:relative;
+    width:8.5in;
+    height:11in;
+    margin:0 auto 20px auto;
+    background:var(--paper);
+    padding:0.55in 0.7in;
+    page-break-after:always;
+    page-break-inside:avoid;
+    box-shadow:0 0 24px rgba(10,22,40,0.18);
+    overflow: hidden;
+  }
+  
+  @media print{
+    html, body { background: #fff !important; }
+    #pdf-toolbar { display: none !important; }
+    .page {
+      margin: 0 !important;
+      box-shadow: none !important;
+      page-break-after: always !important;
+      page-break-inside: avoid !important;
+      width: 8.5in !important;
+      height: 11in !important;
+    }
+  }
+
+  .doc-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:8px;
+    margin-bottom:22px;
+    font-family:var(--mono);
+    font-size:8.5pt;
+    color:var(--text-dim);
+    letter-spacing:0.04em;
+  }
+  .doc-header strong{color:var(--ink);}
+
+  .footer-strip{
+    position:absolute;
+    bottom:0.4in;
+    left:0.7in;
+    right:0.7in;
+    display:flex;
+    justify-content:space-between;
+    font-family:var(--mono);
+    font-size:7.5pt;
+    color:var(--text-dim);
+    border-top:1px solid var(--border);
+    padding-top:6px;
+  }
+
+  /* PAGE 1 — MISSION */
+  .cover{ display:flex; flex-direction:column; }
+  .cover-eyebrow{
+    font-family:var(--mono);
+    font-size:8pt;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--accent-dk);
+    margin-bottom:9px;
+  }
+  .cover-title{
+    font-size:25pt;
+    font-weight:800;
+    line-height:1.1;
+    color:var(--ink);
+    margin-bottom:7px;
+  }
+  .cover-title .tm{font-size:0.4em;vertical-align:super;}
+  .cover-subtitle{
+    font-size:11pt;
+    color:var(--text-dim);
+    font-weight:400;
+    margin-bottom:16px;
+    max-width:6.6in;
+    line-height:1.4;
+  }
+  .cover-badge-row{ display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+  .badge{
+    font-family:var(--mono);
+    font-size:7.5pt;
+    letter-spacing:0.03em;
+    border:1px solid var(--border);
+    color:var(--ink);
+    padding:4px 9px;
+    border-radius:3px;
+    background:#f2f6f9;
+  }
+  .badge.accent{ border-color:var(--accent-dk); color:var(--accent-dk); background:#eafcff; }
+
+  .mission-block{
+    background:var(--ink);
+    color:#E8F4FD;
+    padding:16px 20px;
+    border-radius:6px;
+    margin-bottom:16px;
+  }
+  .mission-block h2{
+    font-family:var(--mono);
+    font-size:8.5pt;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin-bottom:8px;
+  }
+  .mission-block p{ font-size:9.7pt; line-height:1.48; color:#DCEFFB; }
+  .mission-block p + p{ margin-top:8px; }
+
+  .purpose-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+  .purpose-card{
+    border:1px solid var(--border);
+    border-left:4px solid var(--accent-dk);
+    padding:9px 12px;
+    border-radius:4px;
+    background:#fff;
+  }
+  .purpose-card h3{
+    font-size:8.7pt;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--ink);
+    margin-bottom:4px;
+  }
+  .purpose-card p{ font-size:8.4pt; color:var(--text-dim); line-height:1.4; }
+
+  .metrics-row{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:8px;
+    margin-top:6px;
+    padding-top:14px;
+    border-top:1px solid var(--border);
+  }
+  .metric{ text-align:center; }
+  .metric .num{ font-family:var(--mono); font-size:17pt; font-weight:700; color:var(--ink); }
+  .metric .lbl{ font-size:7pt; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-dim); margin-top:2px; }
+
+  .filing-block{
+    margin-top:12px;
+    font-family:var(--mono);
+    font-size:7.5pt;
+    color:var(--text-dim);
+    border-top:1px dashed var(--border);
+    padding-top:8px;
+    display:flex;
+    justify-content:space-between;
+  }
+
+  /* PAGE 2 — REPO CATALOG */
+  .page-title{ font-size:17pt; font-weight:700; color:var(--ink); margin-bottom:2px; }
+  .page-kicker{
+    font-family:var(--mono); font-size:8.5pt; color:var(--accent-dk);
+    letter-spacing:0.1em; text-transform:uppercase; margin-bottom:20px;
+  }
+  .repo-columns{ display:grid; grid-template-columns:1fr 1fr; gap:0 26px; }
+  .repo-entry{ display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid #E4EAEF; }
+  .repo-columns .repo-col-left .repo-entry{ flex-direction:row; }
+  .repo-columns .repo-col-right .repo-entry{ flex-direction:row-reverse; text-align:right; }
+  .repo-index{ flex:0 0 22px; font-family:var(--mono); font-size:9pt; font-weight:700; color:var(--accent-dk); padding-top:2px; }
+  .repo-body{ flex:1; }
+  .repo-name{ font-family:var(--mono); font-size:10.5pt; font-weight:700; color:var(--ink); margin-bottom:2px; }
+  .repo-cat{
+    display:inline-block; font-size:6.8pt; text-transform:uppercase; letter-spacing:0.05em;
+    color:#fff; background:var(--accent-dk); padding:1.5px 5px; border-radius:2px; margin-bottom:4px;
+  }
+  .repo-desc{ font-size:8.6pt; color:var(--text-dim); line-height:1.4; }
+
+  /* PAGE 3 — NOVEL DESIGN CATALOG */
+  .design-list{ display:flex; flex-direction:column; gap:10px; }
+  .design-item{ display:grid; grid-template-columns:36px 1fr; gap:12px; padding-bottom:10px; border-bottom:1px solid #E4EAEF; }
+  .design-num{ font-family:var(--mono); font-size:14pt; font-weight:800; color:#C7D8E4; }
+  .design-title{ font-size:10pt; font-weight:700; color:var(--ink); margin-bottom:2px; }
+  .design-title .tag{
+    font-family:var(--mono); font-size:6.8pt; color:var(--accent-dk); background:#eafcff;
+    border:1px solid #bdeeff; padding:1px 5px; border-radius:2px; margin-left:6px;
+    text-transform:none; font-weight:600; vertical-align:middle;
+  }
+  .design-desc{ font-size:8.5pt; color:var(--text-dim); line-height:1.4; }
+
+  /* PAGE 4 — VISUAL SHOWCASE & 5D WIDGET ENGINE */
+  .visual-grid{ display:grid; grid-template-columns:1.15fr 0.85fr; gap:14px; margin-bottom:14px; }
+  .visual-card{ border:1px solid var(--border); border-radius:6px; overflow:hidden; background:#fff; }
+  .visual-card .cap{
+    font-family:var(--mono); font-size:7pt; color:var(--text-dim);
+    padding:6px 8px; border-top:1px solid #E4EAEF; background:#f8fafb;
+  }
+  .visual-card .render{ background:var(--ink); padding:10px; }
+
+  .palette-row{ display:flex; }
+  .swatch{ flex:1; height:40px; display:flex; align-items:flex-end; padding:3px 5px; }
+  .swatch span{ font-family:var(--mono); font-size:6pt; color:rgba(255,255,255,0.85); }
+
+  .vision-block{ background:var(--ink); color:#E8F4FD; border-radius:6px; padding:16px 20px; margin-top:4px; }
+  .vision-block h2{
+    font-family:var(--mono); font-size:9pt; letter-spacing:0.12em;
+    text-transform:uppercase; color:var(--accent); margin-bottom:8px;
+  }
+  .vision-block p{ font-size:9pt; color:#DCEFFB; line-height:1.5; }
+  .vision-block p + p{ margin-top:8px; }
+  .vision-tags{ display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+  .vision-tags span{
+    font-family:var(--mono); font-size:7pt; color:var(--accent);
+    border:1px solid var(--accent-dk); padding:2px 6px; border-radius:2px;
+  }
+
+  /* Embedded 3D/5D Engine Viewport */
+  #widget-viewport {
+    position: relative; width: 100%; height: 260px; background: #0A1628; border-radius: 4px; overflow: hidden;
+  }
+  #widget-stage { width: 100%; height: 100%; display: block; cursor: crosshair; }
+  #widget-hud-overlay {
+    position: absolute; top: 8px; left: 10px; right: 10px; pointer-events: none;
+    display: flex; justify-content: space-between; font-family: var(--mono); font-size: 8px; color: #00D4FF; letter-spacing: 1px;
+  }
+  .widget-hud-corner { position: absolute; width: 18px; height: 18px; border: 1px solid #00D4FF; opacity: 0.6; pointer-events: none; }
+  .whc-tl { top: 22px; left: 8px; border-right: none; border-bottom: none; }
+  .whc-tr { top: 22px; right: 8px; border-left: none; border-bottom: none; }
+  .whc-bl { bottom: 42px; left: 8px; border-right: none; border-top: none; }
+  .whc-br { bottom: 42px; right: 8px; border-left: none; border-top: none; }
+  #widget-controls {
+    position: absolute; bottom: 6px; left: 8px; right: 8px; background: rgba(13, 31, 60, 0.94);
+    border: 1px solid #1E3A5F; padding: 5px 8px; border-radius: 3px; display: flex; gap: 8px;
+    align-items: center; font-family: var(--mono); font-size: 8px; flex-wrap: wrap;
+  }
+  .w-control-group { display: flex; align-items: center; gap: 4px; }
+  #widget-controls input[type=range] { accent-color: #00D4FF; cursor: pointer; width: 55px; }
+  #widget-controls input[type=text] {
+    background: #0D1F3C; border: 1px solid #1E3A5F; color: #E8F4FD; font-family: var(--mono);
+    font-size: 8px; padding: 2px 4px; border-radius: 2px; width: 100px;
+  }
+  #widget-controls input[type=text]:focus { outline: none; border-color: #00D4FF; }
+  #widget-controls button {
+    background: #162944; border: 1px solid #1E3A5F; color: #00D4FF; font-family: var(--mono);
+    padding: 2px 5px; cursor: pointer; border-radius: 2px; font-size: 7.5px;
+  }
+  #widget-controls button:hover { border-color: #00D4FF; background: #0D1F3C; }
+  #widget-controls button.danger:hover { border-color: #FF3860; color: #FF3860; }
+  #widget-fstatus {
+    font-size: 7px; padding: 2px 4px; border-radius: 2px; border-left: 2px solid #1E3A5F;
+    color: #4B6478; min-width: 70px;
+  }
+  #widget-fstatus.ok { border-left-color: #00C896; color: #00C896; }
+  #widget-fstatus.off { border-left-color: #FF3860; color: #FF3860; }
+
+  .mock-dash{ display:grid; grid-template-columns:repeat(6,1fr); grid-auto-rows:22px; gap:4px; }
+  .mock-panel{
+    background:var(--surface); border:1px solid var(--border); border-radius:3px;
+    padding:4px 5px; display:flex; flex-direction:column; justify-content:space-between;
+  }
+  .mock-panel .t{ font-family:var(--mono); font-size:5.2pt; color:#7BA7CC; }
+  .mock-panel .v{ font-family:var(--mono); font-size:6pt; color:#E8F4FD; }
+  .p1{ grid-column:span 3; grid-row:span 3; }
+  .p2{ grid-column:span 3; grid-row:span 3; }
+  .p3{ grid-column:span 2; grid-row:span 2; }
+  .p4{ grid-column:span 2; grid-row:span 2; }
+  .p5{ grid-column:span 2; grid-row:span 2; }
+</style>
+</head>
+<body>
+
+<div id="pdf-toolbar">
+  <span>ALBERT LANE CATALOG (5D ENGINE)</span>
+  <button onclick="window.print()">PRINT / SAVE AS PDF</button>
+</div>
+
+<!-- ============================================================== -->
+<!-- PAGE 1 — MISSION, GOAL, PURPOSE                                  -->
+<!-- ============================================================== -->
+<section class="page">
+  <div class="doc-header">
+    <span><strong>ALBERT LANE DIGITAL INFRASTRUCTURE</strong> — Engineering Deliverable Catalog</span>
+    <span>Prepared 2026-08-09</span>
+  </div>
+
+  <div class="cover">
+    <div class="cover-eyebrow">Sovereign Citizen Utility Architecture &nbsp;·&nbsp; Portland to Boardman Rebuild Plan</div>
+    <h1 class="cover-title">Albert Lane Digital Infrastructure<span class="tm">™</span></h1>
+    <div class="cover-subtitle">A fifteen-repository sovereign technology estate — civic infrastructure, forensic tooling, geospatial intelligence, a universal integration gateway, a 3D/5D analytics platform, and a self-hosted CI/security pipeline replacing GitHub Actions outright — engineered end to end as a single, cross-referenced system of record.</div>
+
+    <div class="cover-badge-row">
+      <span class="badge accent">15 Repositories</span>
+      <span class="badge accent">4 Product Layers</span>
+      <span class="badge">Rust · TypeScript · Python</span>
+      <span class="badge">Cloudflare Workers · D1 · R2</span>
+      <span class="badge">Tauri 2.0 Desktop</span>
+      <span class="badge">GitHub-Actions-Independent CI</span>
+    </div>
+
+    <div class="mission-block">
+      <h2>Mission Statement</h2>
+      <p><strong>To build sovereign digital infrastructure that a single independent engineer can own outright — architecture, data, and identity — rather than rent from platforms that can revoke access, sell the data, or disappear.</strong> Every service exists because an equivalent commercial product was judged inadequate, extractive, or untrustworthy: permit tracking not beholden to a vendor, terrain intelligence computed from physical law instead of licensed from a mapping monopoly, a browser that doesn't phone home, a community news outlet whose revenue stays in the community it serves.</p>
+      <p>The long-term purpose is broader than any one repository: a civic-technology substrate for a future where digital and physical infrastructure are the same infrastructure — where augmented and virtual reality are how people collaboratively build their own cities, and autonomous and robotic systems join that build-out under the same sovereign, auditable, provenance-tracked standards documented in this catalog.</p>
+    </div>
+
+    <div class="purpose-grid">
+      <div class="purpose-card">
+        <h3>Why It Exists</h3>
+        <p>Independent verification, under duress, that a single person's engineering output can constitute a serious body of work — architected, tested, and documented to a standard that survives scrutiny, not a portfolio of toy projects.</p>
+      </div>
+      <div class="purpose-card">
+        <h3>How It's Built</h3>
+        <p>Every repository is cross-referenced through a shared phase-tracking protocol, a common attribution and license standard, and a structural interconnection point (the XML intelligence pipeline) that every other service writes through.</p>
+      </div>
+      <div class="purpose-card">
+        <h3>What It Proves</h3>
+        <p>Real, running, tested code: Rust unit test suites, live-provisioned cloud databases, TypeScript type-checked across two build targets, and a security/dependency posture audited and modernized on a fixed date, not a resume claim.</p>
+      </div>
+      <div class="purpose-card">
+        <h3>Where It's Going</h3>
+        <p>From desktop dashboards to a mixed-reality, physically-integrated civic build-out — the architecture in this catalog is the substrate that transition is built on top of, not a rewrite that transition will require.</p>
+      </div>
+    </div>
+
+    <div class="metrics-row">
+      <div class="metric"><div class="num">15</div><div class="lbl">Repositories</div></div>
+      <div class="metric"><div class="num">179+</div><div class="lbl">Passing Rust Tests</div></div>
+      <div class="metric"><div class="num">8</div><div class="lbl">GitHub-Actions-Independent Pipeline Stages</div></div>
+      <div class="metric"><div class="num">13</div><div class="lbl">Novel Design Systems</div></div>
+      <div class="metric"><div class="num">4+</div><div class="lbl">Live Cloud Resources Provisioned</div></div>
+    </div>
+
+    <div class="filing-block">
+      <span>SEC Whistleblower Filing No. 17684-273-411-436</span>
+      <span>Washington County Circuit Court No. 50-267345</span>
+      <span>Rights Holder: Albert Lane</span>
+    </div>
+  </div>
+
+  <div class="footer-strip"><span>Page 1 of 4 — Mission &amp; Purpose</span><span>SOVEREIGN IP LICENSE v1 · All Rights Reserved</span></div>
+</section>
+
+<!-- ============================================================== -->
+<!-- PAGE 2 — REPOSITORY CATALOG                                      -->
+<!-- ============================================================== -->
+<section class="page">
+  <div class="doc-header">
+    <span><strong>ALBERT LANE DIGITAL INFRASTRUCTURE</strong> — Engineering Deliverable Catalog</span>
+    <span>Prepared 2026-08-09</span>
+  </div>
+
+  <div class="page-kicker">Section II</div>
+  <div class="page-title">Repository Catalog — Fourteen Systems, One Estate</div>
+  <p style="color:var(--text-dim);font-size:9pt;margin:4px 0 16px;max-width:6.6in;">Each repository below is an independently deployable service. None are demos — each has its own CI pipeline, license, phase roadmap, and test suite, cross-referenced through the shared protocol described on Page 3. Three repositories join the catalog since the prior edition: civic-entity screening, a self-hosted finance/contribution bridge, and a real hardware-backed device-key gate.</p>
+
+  <div class="repo-columns">
+    <div class="repo-col-left">
+      <div class="repo-entry">
+        <div class="repo-index">01</div>
+        <div class="repo-body">
+          <div class="repo-name">/macroharder</div>
+          <span class="repo-cat">Layer B · Analytics</span>
+          <div class="repo-desc">The flagship product: a 3D/5D analytics workbook — standard spreadsheets extended into a ⟨column, row, layer, tick, escape⟩ volumetric address space — with a fully user-adjustable dashboard UI and a capability-gated MCP module host so external services plug in as first-class data sources.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">02</div>
+        <div class="repo-body">
+          <div class="repo-name">/sqlxml</div>
+          <span class="repo-cat">Layer A · Critical Path</span>
+          <div class="repo-desc">The structural interconnection point of the entire estate — an XML-native intelligence pipeline over PostgreSQL with R2 cold storage, a taxonomy guard gate on every write, and a self-resetting cycle governor with trailing structural-drift detection.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">03</div>
+        <div class="repo-body">
+          <div class="repo-name">/lane-mcp</div>
+          <span class="repo-cat">Layer A · Gateway</span>
+          <div class="repo-desc">A self-hosted, standalone MCP gateway giving any compatible client universal programmatic access to the digital estate: source control, XML intelligence, civic registries, and identity, behind one consistent tool-naming convention.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">04</div>
+        <div class="repo-body">
+          <div class="repo-name">/procurement</div>
+          <span class="repo-cat">Layer B · Civic</span>
+          <div class="repo-desc">Sovereign procurement and permit-pipeline tracking with a chain-linked electric-vehicle value ledger, served as an MCP module on live Cloudflare D1 and R2 infrastructure.</div>
+          <div class="repo-desc">A self-hosted, standalone MCP gateway giving any compatible client universal programmatic access to the digital estate: source control, XML intelligence, civic registries, and identity, behind one consistent tool-naming convention.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">04</div>
+        <div class="repo-body">
+          <div class="repo-name">/procurement</div>
+          <span class="repo-cat">Layer B · Civic</span>
+          <div class="repo-desc">Sovereign procurement and permit-pipeline tracking with a chain-linked electric-vehicle value ledger, served as an MCP module on live Cloudflare D1 and R2 infrastructure.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">05</div>
+        <div class="repo-body">
+          <div class="repo-name">/maps</div>
+          <span class="repo-cat">Layer B · Geospatial</span>
+          <div class="repo-desc">Terrain intelligence derived from physical law — runoff, erosion, soil chemistry, mineral favorability — with zero dependence on any third-party map API. The flagship demonstration of MacroHarder's 3D volumetric model.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">06</div>
+        <div class="repo-body">
+          <div class="repo-name">/tauri-rustxml</div>
+          <span class="repo-cat">Layer B · Sovereign Browser</span>
+          <div class="repo-desc">A from-scratch sovereign desktop browser replacing an inherited Angular/Firebase/Chrome stack — Rust-native identity, an encrypted vault, and post-quantum cryptography stubs. Its Froi-Browser device-key gate provisions a real Android Keystore key gated behind biometric hardware.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">07</div>
+        <div class="repo-body">
+          <div class="repo-name">/government</div>
+          <span class="repo-cat">Layer B · Civic Screening</span>
+          <div class="repo-desc">Civic entity risk-screening pipeline — OFAC sanctions, FinCEN BOI, OpenCorporates, SEC EDGAR, and USPTO cross-referenced into a single aggregate RiskProfile, consumed by lane-mcp's civic module.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="repo-col-right">
+      <div class="repo-entry">
+        <div class="repo-index">08</div>
+        <div class="repo-body">
+          <div class="repo-name">/channel-1-news</div>
+          <span class="repo-cat">Layer D · Civic Media</span>
+          <div class="repo-desc">A subscription-funded community journalism platform designed so revenue stays local instead of extracted by consolidated media ownership — geographic routing across eleven Oregon districts, internal forensic evidence tooling, no free tier.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">09</div>
+        <div class="repo-body">
+          <div class="repo-name">/ip-forensics</div>
+          <span class="repo-cat">Layer 0 · Enforcement</span>
+          <div class="repo-desc">Autonomous scanning of GitHub, Docker Hub, Hugging Face, npm, PyPI, crates.io, RubyGems, and NuGet for unauthorized use of this estate's intellectual property — verbatim copy detection, structural AST similarity, and fingerprint corpus matching.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">10</div>
+        <div class="repo-body">
+          <div class="repo-name">/sovereign-canary</div>
+          <span class="repo-cat">Layer A · Public Ledger</span>
+          <div class="repo-desc">A public, append-only, cryptographically fingerprinted violation log — the canary itself: if this repository ever goes silent or shows signs of tampering, that silence is the alarm.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">11</div>
+        <div class="repo-body">
+          <div class="repo-name">/finance-slack-other</div>
+          <span class="repo-cat">Layer B · Treasury</span>
+          <div class="repo-desc">Self-hosted Open Collective bridge — member contributions, distributions, and Slack finance alerts served as MCP tools with an anonymized public ledger, independent of the Open Collective platform itself.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">12</div>
+        <div class="repo-body">
+          <div class="repo-name">/roadmaps</div>
+          <span class="repo-cat">Layer Navigation · Public</span>
+          <div class="repo-desc">The non-proprietary orchestration hub: cross-repo phase tracking, dependency ordering, and an eight-stage GitHub-Actions-independent pipeline synchronized on a fixed cadence across every repository in the estate. Deliberately safe to copy in full.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">13</div>
+        <div class="repo-body">
+          <div class="repo-name">/simcity</div>
+          <span class="repo-cat">Layer Public · Outreach</span>
+          <div class="repo-desc">The public window into the private build-out — an autonomous, hourly, AI-generated isometric city that visually advances in direct proportion to real engineering progress on the private stack.</div>
+        </div>
+      </div>
+      <div class="repo-entry" style="border-bottom:none;">
+        <div class="repo-index">＋</div>
+        <div class="repo-body">
+          <div class="repo-name">Shared Protocol Layer</div>
+          <span class="repo-cat" style="background:var(--ink);">Cross-Cutting</span>
+          <div class="repo-desc">Every repository above shares one license standard, one attribution/provenance header format, one phase-tracking JSON schema, and one SHA-pinned CI security baseline. Froi-Browser contributes its device-key gate directly into tauri-rustxml.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-strip"><span>Page 2 of 4 — Repository Catalog</span><span>SOVEREIGN IP LICENSE v1 · All Rights Reserved</span></div>
+</section>
+
+<!-- ============================================================== -->
+<!-- PAGE 3 — NOVEL DESIGN / SERVICE DELIVERABLES                     -->
+<!-- ============================================================== -->
+<section class="page">
+  <div class="doc-header">
+    <span><strong>ALBERT LANE DIGITAL INFRASTRUCTURE</strong> — Engineering Deliverable Catalog</span>
+    <span>Prepared 2026-08-09</span>
+  </div>
+
+  <div class="page-kicker">Section III</div>
+  <div class="page-title">Novel Design Systems — Service Deliverables</div>
+  <p style="color:var(--text-dim);font-size:9pt;margin:4px 0 16px;max-width:6.6in;">Original engineering patterns designed and implemented within this estate, generalizable beyond it, and presented here as standalone service deliverables in their own right.</p>
+
+  <div class="design-list">
+    <div class="design-item">
+      <div class="design-num">01</div>
+      <div>
+        <div class="design-title">5D Cell Addressing Model <span class="tag">MacroHarder</span></div>
+        <div class="design-desc">Extends the two-dimensional spreadsheet cell — ⟨column, row⟩ — into a five-coordinate address space: ⟨column, row, layer, tick, escape⟩. Layer gives volumetric (sheet-of-sheets) depth; tick and escape reserve temporal versioning and directional-write routing as first-class coordinates rather than bolted-on metadata.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">02</div>
+      <div>
+        <div class="design-title">Capability-Gated MCP Module Host <span class="tag">MacroHarder</span></div>
+        <div class="design-desc">A module registry that validates every cross-service tool call against a declared manifest before dispatch, and enforces a read-only / read-write capability class per module — closing an authorization gap where arbitrary tool names could otherwise be forwarded.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">03</div>
+      <div>
+        <div class="design-title">SOV-RULES Taxonomy Guard <span class="tag">SQLXML</span></div>
+        <div class="design-desc">A versioned XML taxonomy gate enforced immediately before every structural database write, so schema drift and malformed writes are rejected at the boundary rather than discovered downstream.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">04</div>
+      <div>
+        <div class="design-title">21-Day Cycle Governor + n+6 Stabilizer <span class="tag">SQLXML</span></div>
+        <div class="design-desc">A self-resetting operational cycle (day-22 wipe logic) paired with a trailing 6-day recursive debugger that scopes recent history specifically to catch structural drift before it compounds — an audit standard for self-correcting systems.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">05</div>
+      <div>
+        <div class="design-title">Sovereign Provenance &amp; Watermarking Suite <span class="tag">RoadMaps</span></div>
+        <div class="design-desc">A four-part IP-forensics toolkit: BLAKE3 structural content fingerprinting, source-embedded canary tokens, DNS beacon call-home tokens for unauthorized-compile detection, and an AES-256-GCM authenticated append-only provenance ledger.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">06</div>
+      <div>
+        <div class="design-title">Node Certification Ledger (NCL) <span class="tag">RoadMaps · SimCity</span></div>
+        <div class="design-desc">A three-tier append-only safety and seating ledger: Tier 1 generates and dispatches signed certification hashes, Tier 2 maintains the chain-linked public record and a discovery index, Tier 3 runs a variance-rate evaluation with an oscillation gate across fixed evaluation windows.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">07</div>
+      <div>
+        <div class="design-title">Albert Escaped Rays (AER) Protocol <span class="tag">Estate-wide</span></div>
+        <div class="design-desc">A directional-write behavioral contract with a locale registry and an enforced one-read/two-write invariant, giving the estate a formal consistency guarantee for how data escapes from one service boundary into another.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">08</div>
+      <div>
+        <div class="design-title">3D Design Standard &amp; Weighted Audit Scoring <span class="tag">MacroHarder</span></div>
+        <div class="design-desc">A category-weighted PASS / WARN / FAIL compliance scorer for adjustable-UI design-token systems — the quality gate every dashboard preset in the estate is measured against before it ships.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">09</div>
+      <div>
+        <div class="design-title">Cross-Repo Phase Synchronization Protocol <span class="tag">Estate-wide</span></div>
+        <div class="design-desc">A shared, machine-readable roadmap schema — one file per repository, aggregated into a single master roadmap — giving eleven independently deployed services one consistent source of truth for phase state, dependencies, and open work.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">10</div>
+      <div>
+        <div class="design-title">Autonomous IP-Infringement Detection Pipeline <span class="tag">IP-Forensics</span></div>
+        <div class="design-desc">Scanning across eight public package ecosystems and code hosts, combining verbatim-copy hashing, structural AST comparison, and unique-identifier detection to surface unauthorized derivative use as it happens.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">11</div>
+      <div>
+        <div class="design-title">Append-Only Versioned Fact Model <span class="tag">RoadMaps</span></div>
+        <div class="design-desc">A business-data schema where every fact is a permanent, superseded-not-deleted record carrying its own source classification, effective date, and provenance pointer — auto-merge permitted only for explicitly flagged subsets.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">12</div>
+      <div>
+        <div class="design-title">GitHub-Actions-Independent Estate Pipeline <span class="tag">RoadMaps · Estate-wide</span></div>
+        <div class="design-desc">An eight-stage CI, security, IP-enforcement, and merge-readiness pipeline running as plain Python on a cron cadence — proving full CI/CD discipline doesn't require third-party runner platforms.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">13</div>
+      <div>
+        <div class="design-title">MacroHard 3D/5D Planner Workbook Engine <span class="tag">MacroHarder</span></div>
+        <div class="design-desc">A working 3D/5D data-planning tool with Sphere Planner mode, Parallel Grid depth slicing, and a sandboxed live formula evaluator that plots any algebraic expression directly into the volumetric coordinate matrix.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-strip"><span>Page 3 of 4 — Novel Design Systems</span><span>SOVEREIGN IP LICENSE v1 · All Rights Reserved</span></div>
+</section>
+
+<!-- ============================================================== -->
+<!-- PAGE 4 — VISUAL SHOWCASE & LIVE 5D COORDINATE ENGINE             -->
+<!-- ============================================================== -->
+<section class="page">
+  <div class="doc-header">
+    <span><strong>ALBERT LANE DIGITAL INFRASTRUCTURE</strong> — Engineering Deliverable Catalog</span>
+    <span>Prepared 2026-08-09</span>
+  </div>
+
+  <div class="page-kicker">Section IV</div>
+  <div class="page-title">Visual Showcase &amp; the Physical-Digital Merger</div>
+
+  <!-- Live 5D/3D Interactive Engine Viewport -->
+  <div class="visual-card" style="margin-bottom:14px;">
+    <div class="render" style="padding:0;">
+      <div id="widget-viewport">
+        <canvas id="widget-stage"></canvas>
+        <div id="widget-hud-overlay">
+          <div>MACROHARD // SOLIDARITY GOGGLES HUD</div>
+          <div>5D MATRIX: ⟨col, row, layer, tick, escape⟩</div>
+        </div>
+        <div class="widget-hud-corner whc-tl"></div>
+        <div class="widget-hud-corner whc-tr"></div>
+        <div class="widget-hud-corner whc-bl"></div>
+        <div class="widget-hud-corner whc-br"></div>
+        <div id="widget-controls">
+          <div class="w-control-group">
+            <label style="color:#00D4FF">Z-SHEET:</label>
+            <input type="range" id="widget-zSlide" min="0" max="10" step="0.1" value="5">
+            <span id="widget-zVal" style="color:#00D4FF">5.0</span>
+          </div>
+          <div class="w-control-group">
+            <label style="color:#FF6B35">z=</label>
+            <input type="text" id="widget-fInput" value="x / (y * 8000)" spellcheck="false">
+            <button id="widget-btnPlot">⊹ PLOT</button>
+            <button id="widget-btnClear" class="danger">✕ CLEAR</button>
+            <span id="widget-fstatus">no surface plotted</span>
+          </div>
+          <div class="w-control-group">
+            <button id="widget-btnIso">ISOMETRIC</button>
+            <button id="widget-btnReset">RESET CAM</button>
+          </div>
+          <div style="color:#4B6478;margin-left:auto">DRAG: ORBIT</div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">Fig. 1 — Live Interactive MacroHard 5D Coordinate Plane Engine: dynamic algebraic surface plotting (span-normalized), trigonometric camera orbit projection, parallel Z-sheet depth slicing, and Solidarity Goggles AR HUD corner reticles.</div>
+  </div>
+
+  <div class="visual-grid" style="margin-bottom:14px;">
+    <div class="visual-card">
+      <div class="render">
+        <div class="mock-dash">
+          <div class="mock-panel p1"><div class="t">PROCUREMENT · PERMIT_PIPELINE_BOARD</div><div class="v">14 active · 3 review · 2 approval</div></div>
+          <div class="mock-panel p2"><div class="t">MAPS · TERRAIN_VOLUME_LAYER</div><div class="v">(col,row,layer) elevation lattice</div></div>
+          <div class="mock-panel p3"><div class="t">PROCUREMENT · EV_LEDGER_TABLE</div><div class="v">chain-linked · sec_ref bound</div></div>
+          <div class="mock-panel p4"><div class="t">MAPS · SVG_TILE_GALLERY</div><div class="v">isometric · R2-backed</div></div>
+          <div class="mock-panel p5"><div class="t">＋ Install module…</div><div class="v">capability-gated registry</div></div>
+        </div>
+      </div>
+      <div class="cap">Fig. 2 — MacroHarder Dashboard Composer, design rendering built from the layout schema and GlacierNoir token palette.</div>
+    </div>
+
+    <div class="visual-card">
+      <div class="render" style="padding:0;">
+        <div class="palette-row" style="height:100%;">
+          <div class="swatch" style="background:#0A1628;"><span>PRIMARY<br>0A1628</span></div>
+          <div class="swatch" style="background:#0D1F3C;"><span>SURFACE<br>0D1F3C</span></div>
+          <div class="swatch" style="background:#1E3A5F;"><span>BORDER<br>1E3A5F</span></div>
+          <div class="swatch" style="background:#00D4FF;color:#052;"><span style="color:#052;">ACCENT<br>00D4FF</span></div>
+          <div class="swatch" style="background:#00C896;"><span>SUCCESS<br>00C896</span></div>
+          <div class="swatch" style="background:#FF3860;"><span>DANGER<br>FF3860</span></div>
+        </div>
+      </div>
+      <div class="cap">Fig. 3 — The Sovereign design token palette (design-tokens.json), driving every chrome surface across the estate.</div>
+    </div>
+  </div>
+
+<div class="vision-block">
+    <h2>Vision — The Physical-Digital Merger</h2>
+    <p>Every system in this catalog is architected as an API-first, headless service precisely because the interface layer is not the destination. The desktop dashboard and sovereign browser are the current interface, not the permanent one. The plan transitions to augmented/virtual reality as the primary civic interface — walking streets and seeing the permit pipeline, terrain model, and construction status overlaid in place.</p>
+    <p>Integrating autonomous systems into physical build-out under the same provenance and capability-gating standards enforced in software ensures integrity. <strong>Solidarity Goggles</strong> is the mixed-reality layer: a shared, non-siloed augmented view for builders rather than attention-monetized ad space.</p>
+    <div class="vision-tags">
+      <span>AR/VR Presentation Layer</span>
+      <span>Robotics Integration</span>
+      <span>Solidarity Goggles</span>
+      <span>5D Spatial Matrix</span>
+      <span>Public Capability Access</span>
+    </div>
+  </div>
+
+  <div class="footer-strip"><span>Page 4 of 4 — Visual Showcase &amp; Vision</span><span>SOVEREIGN IP LICENSE v1 · All Rights Reserved</span></div>
+</section>
+
+<!-- ============================================================== -->
+<!-- SCRIPT: LIVE 5D COORDINATE ENGINE + AUTO PRINT TO PDF TRIGGER    -->
+<!-- ============================================================== -->
+<script>
+(function() {
+  const canvas = document.getElementById('widget-stage');
+  const ctx = canvas.getContext('2d');
+  let dpr = window.devicePixelRatio || 1;
+
+  function resize() {
+    const parent = canvas.parentElement;
+    canvas.width = parent.clientWidth * dpr;
+    canvas.height = parent.clientHeight * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const cam = { az: 0.65, el: 0.45, dist: 280, tx: 5, ty: 2, tz: 5 };
+  let zSheet = 5.0;
+
+  function project(wx, wy, wz) {
+    const tx = wx - cam.tx, ty = wy - cam.ty, tz = wz - cam.tz;
+    const ca = Math.cos(-cam.az), sa = Math.sin(-cam.az);
+    const rx = tx * ca + tz * sa, ry = ty, rz = -tx * sa + tz * ca;
+    const ce = Math.cos(-cam.el), se = Math.sin(-cam.el);
+    const fx = rx, fy = ry * ce - rz * se, fz = ry * se + rz * ce;
+    const fov = 480, sc = fov / (fov + fz + cam.dist);
+    const W = canvas.parentElement.clientWidth / 2, H = canvas.parentElement.clientHeight / 2;
+    return { sx: W + fx * sc * 36, sy: H - fy * sc * 36, scale: sc, depth: fz };
+  }
+
+  function drawGrid() {
+    ctx.lineWidth = 0.6; ctx.strokeStyle = '#1E3A5F';
+    for (let i = 0; i <= 10; i++) {
+      let a = project(0, 0, i), b = project(10, 0, i);
+      ctx.beginPath(); ctx.moveTo(a.sx, a.sy); ctx.lineTo(b.sx, b.sy); ctx.stroke();
+      let c = project(i, 0, 0), d = project(i, 0, 10);
+      ctx.beginPath(); ctx.moveTo(c.sx, c.sy); ctx.lineTo(d.sx, d.sy); ctx.stroke();
+    }
+  }
+
+  function drawAxes() {
+    const O = project(0,0,0), X = project(10,0,0), Y = project(0,10,0), Z = project(0,0,10);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = '#FF3860'; ctx.beginPath(); ctx.moveTo(O.sx, O.sy); ctx.lineTo(X.sx, X.sy); ctx.stroke();
+    ctx.strokeStyle = '#00C896'; ctx.beginPath(); ctx.moveTo(O.sx, O.sy); ctx.lineTo(Y.sx, Y.sy); ctx.stroke();
+    ctx.strokeStyle = '#00D4FF'; ctx.beginPath(); ctx.moveTo(O.sx, O.sy); ctx.lineTo(Z.sx, Z.sy); ctx.stroke();
+    ctx.font = '10px Courier New';
+    ctx.fillStyle = '#FF3860'; ctx.fillText('X_relo', X.sx + 6, X.sy);
+    ctx.fillStyle = '#00C896'; ctx.fillText('Y_cap', Y.sx, Y.sy - 6);
+    ctx.fillStyle = '#00D4FF'; ctx.fillText('Z_time', Z.sx + 6, Z.sy);
+  }
+
+  function drawZSheetPlane() {
+    const bl = project(0, 0, zSheet), br = project(10, 0, zSheet);
+    const tr = project(10, 10, zSheet), tl = project(0, 10, zSheet);
+    ctx.beginPath();
+    ctx.moveTo(bl.sx, bl.sy); ctx.lineTo(br.sx, br.sy);
+    ctx.lineTo(tr.sx, tr.sy); ctx.lineTo(tl.sx, tl.sy); ctx.closePath();
+    ctx.fillStyle = 'rgba(0, 212, 255, 0.12)'; ctx.fill();
+    ctx.strokeStyle = '#00D4FF'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillStyle = '#00D4FF'; ctx.font = '10px Courier New';
+    ctx.fillText(`Z-SHEET SLICE: ${zSheet.toFixed(1)}`, tr.sx + 8, tr.sy);
+  }
+
+  const GRID_N = 9;
+  let surfacePoints = null;
+
+  function safeEval(expr, x, y, z) {
+    const clean = expr.replace(/[^0-9xyz+\-*/^().\s]/gi, '').replace(/\^/g, '**');
+    try { return Function('x', 'y', 'z', `"use strict"; return (${clean})`)(x, y, z); }
+    catch { return NaN; }
+  }
+  function parseFormula(str) {
+    const m = str.match(/^\s*([xyz])\s*=\s*(.+)$/i);
+    return m ? { dep: m[1].toLowerCase(), expr: m[2].trim() } : null;
+  }
+
+  function plotSurface() {
+    const raw = document.getElementById('widget-fInput').value.trim();
+    const status = document.getElementById('widget-fstatus');
+    const full = raw.includes('=') ? raw : `z = ${raw}`;
+    const pf = parseFormula(full);
+    if (!pf) { status.textContent = 'invalid formula'; status.className = 'off'; surfacePoints = null; return; }
+
+    const raws = [];
+    for (let i = 0; i < GRID_N; i++) {
+      for (let j = 0; j < GRID_N; j++) {
+        const a = (i / (GRID_N - 1)) * 10;
+        const b = (j / (GRID_N - 1)) * 10;
+        let vx, vy, vz;
+        if (pf.dep === 'z') { vx = a; vy = b; vz = safeEval(pf.expr, vx, vy, 0); }
+        else if (pf.dep === 'y') { vx = a; vz = b; vy = safeEval(pf.expr, vx, 0, vz); }
+        else { vy = a; vz = b; vx = safeEval(pf.expr, 0, vy, vz); }
+        raws.push({ i, j, vx, vy, vz });
+      }
+    }
+    const dep = pf.dep;
+    const vals = raws.map(p => p['v' + dep]).filter(v => Number.isFinite(v));
+    if (!vals.length) { status.textContent = 'no finite output'; status.className = 'off'; surfacePoints = null; return; }
+    const lo = Math.min(...vals), hi = Math.max(...vals);
+    const span = hi - lo;
+    surfacePoints = raws.map(p => {
+      let v = p['v' + dep];
+      const dv = Number.isFinite(v) ? (span > 1e-9 ? ((v - lo) / span) * 10 : 5) : null;
+      const out = { x: p.vx, y: p.vy, z: p.vz };
+      out[dep] = dv;
+      out.valid = dv !== null;
+      return out;
+    });
+    status.textContent = `plotted [${lo.toFixed(3)}, ${hi.toFixed(3)}]`;
+    status.className = 'ok';
+  }
+
+  function drawSurface() {
+    if (!surfacePoints) return;
+    ctx.strokeStyle = '#FF6B35'; ctx.fillStyle = '#FF6B35'; ctx.lineWidth = 1;
+    for (let i = 0; i < GRID_N; i++) {
+      for (let j = 0; j < GRID_N; j++) {
+        const idx = i * GRID_N + j;
+        const p = surfacePoints[idx];
+        if (!p.valid) continue;
+        const s = project(p.x, p.y, p.z);
+        ctx.beginPath(); ctx.arc(s.sx, s.sy, 1.6, 0, Math.PI * 2); ctx.fill();
+        if (j < GRID_N - 1 && surfacePoints[idx + 1].valid) {
+          const s2 = project(surfacePoints[idx + 1].x, surfacePoints[idx + 1].y, surfacePoints[idx + 1].z);
+          ctx.globalAlpha = 0.5; ctx.beginPath(); ctx.moveTo(s.sx, s.sy); ctx.lineTo(s2.sx, s2.sy); ctx.stroke(); ctx.globalAlpha = 1;
+        }
+        if (i < GRID_N - 1 && surfacePoints[idx + GRID_N].valid) {
+          const s2 = project(surfacePoints[idx + GRID_N].x, surfacePoints[idx + GRID_N].y, surfacePoints[idx + GRID_N].z);
+          ctx.globalAlpha = 0.5; ctx.beginPath(); ctx.moveTo(s.sx, s.sy); ctx.lineTo(s2.sx, s2.sy); ctx.stroke(); ctx.globalAlpha = 1;
+        }
+      }
+    }
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, canvas.parentElement.clientWidth, canvas.parentElement.clientHeight);
+    drawGrid();
+    drawZSheetPlane();
+    drawSurface();
+    drawAxes();
+    requestAnimationFrame(render);
+  }
+  render();
+
+  let mdown = false, mx = 0, my = 0;
+  canvas.addEventListener('pointerdown', e => { mdown = true; mx = e.clientX; my = e.clientY; });
+  window.addEventListener('pointermove', e => {
+    if (!mdown) return;
+    const dx = e.clientX - mx, dy = e.clientY - my;
+    mx = e.clientX; my = e.clientY;
+    cam.az += dx * 0.006;
+    cam.el = Math.max(0.05, Math.min(Math.PI / 2 - 0.05, cam.el - dy * 0.006));
+  });
+  window.addEventListener('pointerup', () => mdown = false);
+
+  document.getElementById('widget-zSlide').addEventListener('input', e => {
+    zSheet = parseFloat(e.target.value);
+    document.getElementById('widget-zVal').textContent = zSheet.toFixed(1);
+  });
+  document.getElementById('widget-btnIso').addEventListener('click', () => { cam.az = 0.785; cam.el = 0.615; });
+  document.getElementById('widget-btnReset').addEventListener('click', () => { cam.az = 0.65; cam.el = 0.45; });
+  document.getElementById('widget-btnPlot').addEventListener('click', plotSurface);
+  document.getElementById('widget-btnClear').addEventListener('click', () => {
+    surfacePoints = null;
+    const status = document.getElementById('widget-fstatus');
+    status.textContent = 'no surface plotted'; status.className = '';
+  });
+
+  // Plot default formula surface immediately so it renders in the PDF output
+  plotSurface();
+
+  // Trigger PDF print dialog once canvas initial render completes
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      window.print();
+    }, 500);
+  });
+})();
+</script>
+</body>
+</html>
