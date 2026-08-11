@@ -101,13 +101,47 @@
       "trigger_ts": null,
       "trigger_domain": null,
       "registered": true
+    },
+    {
+      "token": "SC-9da4c27d9d4f408e-MKT-0",
+      "type": "marketing_article",
+      "context": "Channel-1-News article for iteration 0",
+      "iteration": 0,
+      "generated": "2026-08-11T05:14:53Z",
+      "triggered": false,
+      "trigger_ts": null,
+      "trigger_domain": null,
+      "registered": true
+    },
+    {
+      "token": "SC-4bb94c7d9c8420a5-SITE-0",
+      "type": "site_page",
+      "context": "albertlane.org/SimCity page view, iteration 0",
+      "iteration": 0,
+      "generated": "2026-08-11T05:14:53Z",
+      "triggered": false,
+      "trigger_ts": null,
+      "trigger_domain": null,
+      "registered": true
+    },
+    {
+      "token": "SC-96b0623a8c7b9e32-SVG-0",
+      "type": "svg_hotlink",
+      "context": "SVG asset None iteration 0",
+      "iteration": 0,
+      "zone": null,
+      "generated": "2026-08-11T05:14:53Z",
+      "triggered": false,
+      "trigger_ts": null,
+      "trigger_domain": null,
+      "registered": true
     }
   ],
   "triggered": [],
   "reach_score": 0.0,
   "domains_seen": [],
   "incidents": [],
-  "last_cycle": "2026-08-11T01:55:55Z",
+  "last_cycle": "2026-08-11T05:14:53Z",
   "_meta": {
     "authored_by": "Albert Lane | SovereignAudits\u2122",
     "sec_ref": "17684-273-411-436",
