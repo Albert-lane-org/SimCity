@@ -1,0 +1,865 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Albert Lane — Engineering Deliverable Catalog (2026-08-25)</title>
+<style>
+/* ============================================================
+   PRINT-PAGE LAYOUT — Letter 8.5 × 11 in, 4 pages
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:       #0A1628;
+  --surface:   #0D1F3C;
+  --border:    #1E3A5F;
+  --accent:    #00D4FF;
+  --success:   #00C896;
+  --danger:    #FF3860;
+  --warm:      #FF6B35;
+  --muted:     #7BA7CC;
+  --text:      #F0F4F8;
+  --text-dim:  #8AAAC8;
+  --paper:     #FCFDFE;
+  --mono:      'Courier New', Courier, monospace;
+  --sans:      'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+body {
+  background: #DDE2E8;
+  font-family: var(--sans);
+  color: var(--ink);
+}
+
+/* ---- Page shell ---- */
+.page {
+  width: 8.5in;
+  min-height: 11in;
+  background: var(--paper);
+  margin: 0.3in auto;
+  padding: 0.55in 0.7in;
+  position: relative;
+  page-break-after: always;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  overflow: hidden;
+}
+
+/* ---- Running header ---- */
+.doc-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1.5pt solid var(--ink);
+  padding-bottom: 5px;
+  margin-bottom: 18px;
+  font-size: 8pt;
+  letter-spacing: 0.02em;
+  color: #444;
+}
+
+/* ---- Footer strip ---- */
+.footer-strip {
+  position: absolute;
+  bottom: 0.35in;
+  left: 0.7in;
+  right: 0.7in;
+  display: flex;
+  justify-content: space-between;
+  font-size: 7.5pt;
+  color: #888;
+  border-top: 0.5pt solid #ccc;
+  padding-top: 5px;
+}
+
+/* ============================================================
+   PAGE 1 — COVER
+   ============================================================ */
+.cover-eyebrow {
+  font-size: 7.5pt;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
+.cover-eyebrow span { color: var(--ink); font-weight: 600; }
+
+.cover-title {
+  font-size: 28pt;
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.5pt;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+.cover-title .tm { font-size: 12pt; vertical-align: super; font-weight: 400; letter-spacing: 0; }
+
+.cover-subtitle {
+  font-size: 11pt;
+  color: #555;
+  margin-bottom: 18px;
+  max-width: 5.5in;
+  line-height: 1.5;
+}
+
+.cover-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 26px;
+}
+.badge {
+  background: var(--ink);
+  color: #eef4ff;
+  font-size: 7pt;
+  letter-spacing: 0.08em;
+  padding: 3px 9px;
+  border-radius: 2px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.mission-block {
+  background: #F4F7FA;
+  border-left: 3pt solid var(--ink);
+  padding: 14px 18px;
+  margin-bottom: 18px;
+}
+.mission-block h2 {
+  font-size: 8pt;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 8px;
+}
+.mission-block p {
+  font-size: 9pt;
+  line-height: 1.6;
+  color: #333;
+  margin-bottom: 6px;
+}
+.mission-block p:last-child { margin-bottom: 0; }
+
+.purpose-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.purpose-card {
+  background: #F8FAFB;
+  border: 0.5pt solid #D8DFE8;
+  padding: 11px 14px;
+}
+.purpose-card h3 {
+  font-size: 7.5pt;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #666;
+  margin-bottom: 6px;
+}
+.purpose-card p {
+  font-size: 8.5pt;
+  line-height: 1.55;
+  color: #444;
+}
+
+.metrics-row {
+  display: flex;
+  gap: 0;
+  border: 0.5pt solid #D0D8E4;
+  margin-bottom: 18px;
+}
+.metric {
+  flex: 1;
+  text-align: center;
+  padding: 12px 8px;
+  border-right: 0.5pt solid #D0D8E4;
+}
+.metric:last-child { border-right: none; }
+.metric .num {
+  font-size: 18pt;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.1;
+}
+.metric .lbl {
+  font-size: 7pt;
+  color: #777;
+  letter-spacing: 0.05em;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.filing-block {
+  display: flex;
+  justify-content: space-between;
+  font-size: 7.5pt;
+  color: #999;
+  border-top: 0.5pt solid #D0D8E4;
+  padding-top: 8px;
+  font-family: var(--mono);
+}
+
+/* ============================================================
+   PAGE 2 — REPO CATALOG
+   ============================================================ */
+.page-kicker {
+  font-size: 7.5pt;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+.page-title {
+  font-size: 16pt;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 6px;
+  letter-spacing: -0.3pt;
+}
+
+.repo-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 22px;
+}
+.repo-entry {
+  display: flex;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 0.5pt solid #E4E9F0;
+}
+.repo-index {
+  font-family: var(--mono);
+  font-size: 8.5pt;
+  color: #bbb;
+  min-width: 20px;
+  padding-top: 1px;
+}
+.repo-name {
+  font-family: var(--mono);
+  font-size: 9pt;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 3px;
+}
+.repo-cat {
+  display: inline-block;
+  font-size: 6.5pt;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: #EEF3FA;
+  color: #667;
+  padding: 1px 6px;
+  border-radius: 2px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.repo-desc {
+  font-size: 7.5pt;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   PAGE 3 — DESIGN SYSTEMS
+   ============================================================ */
+.design-list { display: flex; flex-direction: column; gap: 0; }
+.design-item {
+  display: flex;
+  gap: 14px;
+  padding: 9px 0;
+  border-bottom: 0.5pt solid #E4E9F0;
+}
+.design-num {
+  font-family: var(--mono);
+  font-size: 19pt;
+  font-weight: 800;
+  color: #E4E9F0;
+  min-width: 36px;
+  line-height: 1;
+  padding-top: 2px;
+}
+.design-title {
+  font-size: 9pt;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 3px;
+}
+.tag {
+  display: inline-block;
+  font-size: 6.5pt;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: #EEF3FA;
+  color: #667;
+  padding: 1px 6px;
+  border-radius: 2px;
+  font-weight: 600;
+  margin-left: 6px;
+  vertical-align: middle;
+}
+.design-desc {
+  font-size: 8pt;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* ============================================================
+   PAGE 4 — VISUAL + VISION
+   ============================================================ */
+.visual-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.visual-card { display: flex; flex-direction: column; gap: 6px; }
+.render {
+  background: var(--ink);
+  border-radius: 4px;
+  padding: 14px;
+  height: 160px;
+  overflow: hidden;
+  position: relative;
+}
+.cap {
+  font-size: 7pt;
+  color: #777;
+  line-height: 1.45;
+  font-style: italic;
+}
+
+/* mock dashboard inside render */
+.mock-dash {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto auto;
+  gap: 6px;
+  height: 100%;
+}
+.mock-panel {
+  background: var(--surface);
+  border: 0.5pt solid var(--border);
+  border-radius: 2px;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.mock-panel.p1 { grid-column: 1; border-top: 1.5pt solid var(--accent); }
+.mock-panel.p2 { grid-column: 2; border-top: 1.5pt solid var(--success); }
+.mock-panel.p3 { grid-column: 1; border-top: 1.5pt solid var(--accent); }
+.mock-panel.p4 { grid-column: 2; border-top: 1.5pt solid var(--success); }
+.mock-panel.p5 { grid-column: 1/3; border: 1pt dashed var(--border); }
+.mock-panel .t { font-family: var(--mono); font-size: 6pt; color: var(--muted); letter-spacing: 0.06em; }
+.mock-panel .v { font-size: 7pt; color: var(--text); font-weight: 600; }
+
+/* color palette swatch */
+.palette-row { display: flex; height: 100%; }
+.swatch {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  padding: 4px 4px;
+}
+.swatch span { font-family: var(--mono); font-size: 6.5pt; color: rgba(255,255,255,0.75); line-height: 1.3; }
+
+/* vision block */
+.vision-block {
+  background: #F4F7FA;
+  border-left: 3pt solid var(--ink);
+  padding: 14px 18px;
+  margin-top: 10px;
+}
+.vision-block h2 {
+  font-size: 10pt;
+  font-weight: 800;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+.vision-block p {
+  font-size: 8.5pt;
+  line-height: 1.6;
+  color: #444;
+  margin-bottom: 8px;
+}
+.vision-block p:last-of-type { margin-bottom: 10px; }
+.vision-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.vision-tags span {
+  font-size: 7pt;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: #EEF4FF;
+  padding: 3px 9px;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+@media print {
+  body { background: none; }
+  .page { margin: 0; box-shadow: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================== -->
+<!-- PAGE 1 — MISSION & PURPOSE                                       -->
+<!-- ============================================================== -->
+<section class="page">
+  <div class="doc-header">
+    <span><strong>ALBERT LANE DIGITAL INFRASTRUCTURE</strong> — Engineering Deliverable Catalog</span>
+    <span>Prepared 2026-08-25</span>
+  </div>
+
+  <div style="padding-top:0.05in;">
+    <div class="cover-eyebrow">
+      <span>Albert Lane</span> &nbsp;·&nbsp; Digital Infrastructure Estate &nbsp;·&nbsp;
+      Fifth Edition — 2026-08-25 &nbsp;·&nbsp; SEC Whistleblower No. 17684-273-411-436
+    </div>
+
+    <div class="cover-title">
+      Engineering Deliverable Catalog<span class="tm">™</span>
+    </div>
+
+    <div class="cover-subtitle">
+      A comprehensive catalog of original engineering deliverables constituting the Albert Lane sovereign digital infrastructure: fifteen repositories, sixteen deployed modules, a ten-stage CI/security pipeline independent of GitHub Actions, and a 6-provider OAuth identity rail — all cross-referenced, phase-tracked, and operating under a single provenance and attribution standard.
+    </div>
+
+    <div class="cover-badge-row">
+      <span class="badge">15 Repositories</span>
+      <span class="badge">16 MCP Modules · 46 Tools</span>
+      <span class="badge">10 Pipeline Stages</span>
+      <span class="badge">4 Product Layers</span>
+      <span class="badge">Tauri 2.0 Desktop</span>
+      <span class="badge">SSO · 6 OAuth Providers</span>
+      <span class="badge">GitHub-Actions-Independent CI</span>
+    </div>
+
+    <div class="mission-block">
+      <h2>Mission Statement</h2>
+      <p><strong>To build sovereign digital infrastructure that a single independent engineer can own outright — architecture, data, and identity — rather than rent from platforms that can revoke access, sell the data, or disappear.</strong> Every service exists because an equivalent commercial product was judged inadequate, extractive, or untrustworthy: permit tracking not beholden to a vendor, terrain intelligence computed from physical law instead of licensed from a mapping monopoly, a browser that doesn't phone home, a community news outlet whose revenue stays in the community it serves.</p>
+      <p>The long-term purpose is broader than any one repository: a civic-technology substrate for a future where digital and physical infrastructure are the same infrastructure — where augmented and virtual reality are how people collaboratively build their own cities, and autonomous and robotic systems join that build-out under the same sovereign, auditable, provenance-tracked standards documented in this catalog.</p>
+    </div>
+
+    <div class="purpose-grid">
+      <div class="purpose-card">
+        <h3>Why It Exists</h3>
+        <p>Independent verification, under duress, that a single person's engineering output can constitute a serious body of work — architected, tested, and documented to a standard that survives scrutiny, not a portfolio of toy projects.</p>
+      </div>
+      <div class="purpose-card">
+        <h3>How It's Built</h3>
+        <p>Every repository is cross-referenced through a shared phase-tracking protocol, a common attribution and license standard, and a structural interconnection point (the XML intelligence pipeline) that every other service writes through.</p>
+      </div>
+      <div class="purpose-card">
+        <h3>What It Proves</h3>
+        <p>Real, running, tested code: Rust unit test suites, live-provisioned cloud databases, TypeScript type-checked across two build targets, and a security/dependency posture audited and modernized on a fixed date, not a resume claim.</p>
+      </div>
+      <div class="purpose-card">
+        <h3>Where It's Going</h3>
+        <p>From desktop dashboards to a mixed-reality, physically-integrated civic build-out — the architecture in this catalog is the substrate that transition is built on top of, not a rewrite that transition will require.</p>
+      </div>
+    </div>
+
+    <div class="metrics-row">
+      <div class="metric"><div class="num">15</div><div class="lbl">Repositories</div></div>
+      <div class="metric"><div class="num">205+</div><div class="lbl">Passing Rust Tests</div></div>
+      <div class="metric"><div class="num">10</div><div class="lbl">GitHub-Actions-Independent Pipeline Stages</div></div>
+      <div class="metric"><div class="num">14</div><div class="lbl">Novel Design Systems</div></div>
+      <div class="metric"><div class="num">4+</div><div class="lbl">Live Cloud Resources Provisioned</div></div>
+    </div>
+
+    <div class="filing-block">
+      <span>SEC Whistleblower Filing No. 17684-273-411-436</span>
+      <span>Washington County Circuit Court No. 50-267345</span>
+      <span>Rights Holder: Albert Lane</span>
+    </div>
+  </div>
+
+  <div class="footer-strip"><span>Page 1 of 4 — Mission &amp; Purpose</span><span>SOVEREIGN IP LICENSE v1 · All Rights Reserved</span></div>
+</section>
+
+<!-- ============================================================== -->
+<!-- PAGE 2 — REPOSITORY CATALOG                                      -->
+<!-- ============================================================== -->
+<section class="page">
+  <div class="doc-header">
+    <span><strong>ALBERT LANE DIGITAL INFRASTRUCTURE</strong> — Engineering Deliverable Catalog</span>
+    <span>Prepared 2026-08-25</span>
+  </div>
+
+  <div class="page-kicker">Section II</div>
+  <div class="page-title">Repository Catalog — Fifteen Systems, One Estate</div>
+  <p style="color:var(--text-dim);font-size:9.5pt;margin:6px 0 16px;max-width:6.6in;">Each repository below is an independently deployable service. None are demos — each has its own CI pipeline, license, phase roadmap, and test suite, cross-referenced through the shared protocol described on Page 3. Since the prior edition (2026-08-09): Froi-Browser achieved a complete Tauri 2.0 sovereign browser with Phase 7 SSO Identity Rail merged (2026-08-22); lane-mcp gained its SSO module (Phase 16, 46 tools across 16 modules); the estate pipeline expanded from 8 to 10 stages with phantom-fix detection and a dependency-bot engine rewrite; Government added EPA/DEQ and DOT/FMCSA civic data subsystems; and a real, proprietary dependency-security pipeline replaced GitHub Dependabot estate-wide.</p>
+
+  <div class="repo-columns">
+    <div class="repo-col-left">
+      <div class="repo-entry">
+        <div class="repo-index">01</div>
+        <div class="repo-body">
+          <div class="repo-name">/macroharder</div>
+          <span class="repo-cat">Layer B · Analytics</span>
+          <div class="repo-desc">The flagship product: a 3D analytics workbook — standard spreadsheets extended into a (column, row, layer) volumetric address space — with a fully user-adjustable dashboard UI and a capability-gated MCP module host so external services plug in as first-class data sources. Phase 15 (IPI Modifier Calculator) complete; 94/94 Rust tests passing.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">02</div>
+        <div class="repo-body">
+          <div class="repo-name">/sqlxml</div>
+          <span class="repo-cat">Layer A · Critical Path</span>
+          <div class="repo-desc">The structural interconnection point of the entire estate — an XML-native intelligence pipeline over PostgreSQL with R2 cold storage, a taxonomy guard gate on every write, and a self-resetting cycle governor with trailing structural-drift detection. 48 Rust + 158 Python tests. AR/VR storage interface layer Phase 8 in progress.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">03</div>
+        <div class="repo-body">
+          <div class="repo-name">/lane-mcp</div>
+          <span class="repo-cat">Layer A · Gateway</span>
+          <div class="repo-desc">A self-hosted, standalone MCP gateway giving any compatible client universal programmatic access to the digital estate: 46 tools across 16 modules — sqlxml, github, civic, identity, AER, monitoring, sovereign, open-collective, simcity, procurement_engine, government, editor, terminal, canary, LaneVM, and a new SSO module (Phase 16) providing real OAuth 2.0/OIDC flows for Google, Microsoft, Apple, Amazon, Meta, and GitHub.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">04</div>
+        <div class="repo-body">
+          <div class="repo-name">/procurement</div>
+          <span class="repo-cat">Layer B · Civic</span>
+          <div class="repo-desc">Sovereign procurement and permit-pipeline tracking with a chain-linked electric-vehicle value ledger, an IPI sourcing gate on every procurement decision (Phase 12 complete), an open business registry, and a ZIP-collective resource valuation marketplace — served as an MCP module on live Cloudflare D1 and R2 infrastructure.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">05</div>
+        <div class="repo-body">
+          <div class="repo-name">/maps</div>
+          <span class="repo-cat">Layer B · Geospatial</span>
+          <div class="repo-desc">Terrain intelligence derived from physical law — runoff, erosion, soil chemistry, mineral favorability, topographic analysis, contour lines, watershed delineation — with zero dependence on any third-party map API. Phase 12 complete; 78/78 Python tests passing.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">06</div>
+        <div class="repo-body">
+          <div class="repo-name">/tauri-rustxml</div>
+          <span class="repo-cat">Layer B · Sovereign Browser</span>
+          <div class="repo-desc">A from-scratch sovereign desktop browser replacing an inherited Angular/Firebase/Chrome stack — Rust-native identity, AES-256-GCM encrypted vault, post-quantum cryptography stubs, AR/VR spatial session management, and a WASM presence-attestation bridge. 44/44 Rust tests. Phase 8 complete; Phase 9 (NexusCore → Froi-Browser retrofit) planned.</div>
+        </div>
+      </div>
+      <div class="repo-entry" style="border-bottom:none;">
+        <div class="repo-index">07</div>
+        <div class="repo-body">
+          <div class="repo-name">/government</div>
+          <span class="repo-cat">Layer B · Civic Screening</span>
+          <div class="repo-desc">Civic entity risk-screening pipeline — OFAC, FinCEN BOI, OpenCorporates, SEC EDGAR, USPTO, EPA ECHO environmental compliance (deq/), and FMCSA motor carrier safety (dot/) — aggregated into a single RiskProfile. Phase 6 complete with EPA/DEQ and DOT subsystems; IRS + FINRA data tooling (Phase 5) also complete. 33+ tests per subsystem.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="repo-col-right">
+      <div class="repo-entry">
+        <div class="repo-index">08</div>
+        <div class="repo-body">
+          <div class="repo-name">/froi-browser</div>
+          <span class="repo-cat">Layer B · Sovereign Browser</span>
+          <div class="repo-desc">A complete Tauri 2.0 sovereign browser — the full Phase 4–6 UI restoration landed all original panes (Editor, Terminal, Canary, browser chrome, overlay stack) as real vanilla TypeScript wired to NexusCore, sqlxml, and lane-mcp. Phase 7 SSO Identity Rail merged 2026-08-22: real OAuth 2.0/OIDC authorize/exchange flows for 6 providers exposed in a left-panel identity rail backed by lane-mcp's SSO module. 19/19 Rust tests. Deployed web target verified via headless Chromium.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">09</div>
+        <div class="repo-body">
+          <div class="repo-name">/channel-1-news</div>
+          <span class="repo-cat">Layer D · Civic Media</span>
+          <div class="repo-desc">A subscription-funded community journalism platform designed so revenue stays local — geographic routing across eleven Oregon districts, 8 MCP tools, Stripe-backed paywall, GitHub webhook receiver, sandboxed draft-preview renderer via Worker Loader API, a C-Stream beacon endpoint, and a bi-hourly session audit cron handler. 69/69 Python tests.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">10</div>
+        <div class="repo-body">
+          <div class="repo-name">/ip-forensics</div>
+          <span class="repo-cat">Layer 0 · Enforcement</span>
+          <div class="repo-desc">Autonomous scanning of GitHub, Docker Hub, Hugging Face, npm, PyPI, crates.io, RubyGems, and NuGet for unauthorized use of sovereign IP — verbatim copy detection, Python and JS/TS structural AST similarity, canary token seeding, DMCA §512(c)(3) drafting, provenance-bombing, and a self-scan-proof candidate pipeline. Phase 14 complete; 208 total tests.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">11</div>
+        <div class="repo-body">
+          <div class="repo-name">/sovereign-canary</div>
+          <span class="repo-cat">Layer A · Public Ledger</span>
+          <div class="repo-desc">A public, append-only, cryptographically fingerprinted violation log — the canary itself: if this repository ever goes silent or shows signs of tampering, that silence is the alarm. Phase 11 complete: C-Stream integration, KV-backed mesh node registry, canary token rotation, and auto-escalation of DMCA violations to provenance_lock mesh nodes.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">12</div>
+        <div class="repo-body">
+          <div class="repo-name">/finance-slack-other</div>
+          <span class="repo-cat">Layer B · Treasury</span>
+          <div class="repo-desc">Self-hosted Open Collective bridge — member contributions, distributions, Slack finance alerts, and a new lane-mcp financial reporting pipeline (Phase 10) served as MCP tools with an anonymized public ledger and HMAC-SHA256-signed webhook receiver. 28/28 vitest tests.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">13</div>
+        <div class="repo-body">
+          <div class="repo-name">/roadmaps</div>
+          <span class="repo-cat">Layer Navigation · Public</span>
+          <div class="repo-desc">The non-proprietary orchestration hub: cross-repo phase tracking, dependency ordering, and a ten-stage GitHub-Actions-independent pipeline (conflict resolution, CI, Lane-SpatialFold dependency integrity, proprietary dependable-bot, lockfile orphan audit, merge-readiness, IP enforcement, SimCity extended pipeline, data compilation, business plan) synchronized every 4 hours. Deliberately safe to copy in full.</div>
+        </div>
+      </div>
+      <div class="repo-entry">
+        <div class="repo-index">14</div>
+        <div class="repo-body">
+          <div class="repo-name">/simcity</div>
+          <span class="repo-cat">Layer Public · Outreach</span>
+          <div class="repo-desc">The public window into the private build-out — an autonomous, AI-generated isometric city that visually advances in direct proportion to real engineering progress on the private stack, with a marketing engine, canary reach probes, web deployment pipeline, and a human-review-required skill improvement proposer. This document was generated from this repository.</div>
+        </div>
+      </div>
+      <div class="repo-entry" style="border-bottom:none;">
+        <div class="repo-index">＋</div>
+        <div class="repo-body">
+          <div class="repo-name">Shared Protocol Layer</div>
+          <span class="repo-cat" style="background:var(--ink);">Cross-Cutting</span>
+          <div class="repo-desc">Every repository above shares one license standard, one attribution/provenance header format, one phase-tracking JSON schema, and one SHA-pinned CI security baseline. A fifteenth repository, <em>project_name_pending</em>, remains unscoped and is intentionally not catalogued here as a deliverable.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-strip"><span>Page 2 of 4 — Repository Catalog</span><span>SOVEREIGN IP LICENSE v1 · All Rights Reserved</span></div>
+</section>
+
+<!-- ============================================================== -->
+<!-- PAGE 3 — NOVEL DESIGN / SERVICE DELIVERABLES                     -->
+<!-- ============================================================== -->
+<section class="page">
+  <div class="doc-header">
+    <span><strong>ALBERT LANE DIGITAL INFRASTRUCTURE</strong> — Engineering Deliverable Catalog</span>
+    <span>Prepared 2026-08-25</span>
+  </div>
+
+  <div class="page-kicker">Section III</div>
+  <div class="page-title">Novel Design Systems — Service Deliverables</div>
+  <p style="color:var(--text-dim);font-size:9.5pt;margin:6px 0 16px;max-width:6.6in;">Original engineering patterns designed and implemented within this estate, generalizable beyond it, and presented here as standalone service deliverables in their own right. Two additions since the prior edition: a sandboxed typed-instruction virtual machine (LaneVM) and a stateless multi-provider OAuth identity rail (SSO Module).</p>
+
+  <div class="design-list">
+    <div class="design-item">
+      <div class="design-num">01</div>
+      <div>
+        <div class="design-title">5D Cell Addressing Model <span class="tag">MacroHarder</span></div>
+        <div class="design-desc">Extends the two-dimensional spreadsheet cell — ⟨column, row⟩ — into a five-coordinate address space: ⟨column, row, layer, time, domain⟩. Layer gives volumetric (sheet-of-sheets) depth; time and domain reserve temporal versioning and cross-domain analysis as first-class coordinates rather than bolted-on metadata. DOMAIN_SPATIAL/FINANCIAL/CIVIC/TERRAIN constants defined; 5D kriging interpolation via C kernel FFI.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">02</div>
+      <div>
+        <div class="design-title">Capability-Gated MCP Module Host <span class="tag">MacroHarder</span></div>
+        <div class="design-desc">A module registry that validates every cross-service tool call against a declared manifest before dispatch, and enforces a read-only / read-write capability class per module — closing a real authorization gap where any tool name could otherwise be forwarded to any registered service.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">03</div>
+      <div>
+        <div class="design-title">SOV-RULES Taxonomy Guard <span class="tag">SQLXML</span></div>
+        <div class="design-desc">A versioned XML taxonomy gate enforced immediately before every structural database write, so schema drift and malformed writes are rejected at the boundary rather than discovered downstream.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">04</div>
+      <div>
+        <div class="design-title">21-Day Cycle Governor + n+6 Stabilizer <span class="tag">SQLXML</span></div>
+        <div class="design-desc">A self-resetting operational cycle (day-22 wipe logic) paired with a trailing 6-day recursive debugger that scopes recent history specifically to catch structural drift before it compounds — an audit standard for systems that must self-correct without human intervention.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">05</div>
+      <div>
+        <div class="design-title">Sovereign Provenance &amp; Watermarking Suite <span class="tag">RoadMaps</span></div>
+        <div class="design-desc">A four-part IP-forensics toolkit: BLAKE3 structural content fingerprinting, source-embedded canary tokens, DNS beacon call-home tokens for unauthorized-compile detection, and an AES-256-GCM authenticated append-only provenance ledger. A full security-standard specification, not a single script.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">06</div>
+      <div>
+        <div class="design-title">Node Certification Ledger (NCL) <span class="tag">RoadMaps · SimCity</span></div>
+        <div class="design-desc">A three-tier append-only safety and seating ledger: Tier 1 generates and dispatches signed certification hashes, Tier 2 maintains the chain-linked public record and a discovery index, Tier 3 runs a variance-rate evaluation with an oscillation gate across fixed T-30/T-45 evaluation windows.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">07</div>
+      <div>
+        <div class="design-title">Albert Escaped Rays (AER) Protocol <span class="tag">Estate-wide</span></div>
+        <div class="design-desc">A directional-write behavioral contract with a locale registry and an enforced one-read/two-write invariant, giving the estate a formal consistency guarantee for how data escapes from one service boundary into another.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">08</div>
+      <div>
+        <div class="design-title">3D Design Standard &amp; Weighted Audit Scoring <span class="tag">MacroHarder</span></div>
+        <div class="design-desc">A category-weighted PASS / WARN / FAIL compliance scorer for adjustable-UI design-token systems — the quality gate every dashboard preset in the estate is measured against before it ships.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">09</div>
+      <div>
+        <div class="design-title">Cross-Repo Phase Synchronization Protocol <span class="tag">Estate-wide</span></div>
+        <div class="design-desc">A shared, machine-readable roadmap schema — one file per repository, aggregated into a single master roadmap — giving fifteen independently deployed services one consistent source of truth for phase state, dependencies, and open work.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">10</div>
+      <div>
+        <div class="design-title">Autonomous IP-Infringement Detection Pipeline <span class="tag">IP-Forensics</span></div>
+        <div class="design-desc">Scanning across eight public package ecosystems and code hosts, combining verbatim-copy hashing, structural Python and JS/TS AST comparison, and unique-identifier detection to surface unauthorized derivative use as it happens, not months later. Phase 14 self-scan-proof candidate pipeline removes false positives against the estate's own code by construction.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">11</div>
+      <div>
+        <div class="design-title">Append-Only Versioned Fact Model <span class="tag">RoadMaps</span></div>
+        <div class="design-desc">A business-data schema where every fact is a permanent, superseded-not-deleted record carrying its own source classification, effective date, and provenance pointer — auto-merge permitted only for a narrow, explicitly-flagged subset of fields, everything else routed to human review, with a validator suite that fails closed rather than silently passing.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">12</div>
+      <div>
+        <div class="design-title">GitHub-Actions-Independent Estate Pipeline <span class="tag">RoadMaps · Estate-wide</span></div>
+        <div class="design-desc">A ten-stage CI, security, IP-enforcement, and merge-readiness pipeline running as plain Python on a cron cadence — built after a sustained, owner-unresolvable GitHub org policy block made the platform's own Actions product unusable estate-wide. Stages: conflict resolution, local CI, Lane-SpatialFold Sacred Zero dependency integrity, proprietary dependable-bot (npm advisory bulk endpoint + cargo-audit), lockfile orphan audit (phantom-fix detection), merge-readiness decision, IP forensics, SimCity extended pipeline, data compilation, and business plan pipeline.</div>
+      </div>
+    </div>
+    <div class="design-item">
+      <div class="design-num">13</div>
+      <div>
+        <div class="design-title">LaneVM — Sandboxed Typed-Instruction Interpreter <span class="tag">lane-mcp</span></div>
+        <div class="design-desc">A sandboxed, typed-instruction interpreter (MEM_WRITE / MEM_READ / COMPUTE / FLOW_CONTROL) with no eval or dynamic execution surface. COMPUTE is gated to a fixed arithmetic whitelist (add/sub/mul/div/mod/min/max/avg); SYS_CALL and IO_SINK are unconditionally rejected at the dispatch level, not just documented as disallowed. Per-call memory cap (1024 entries) and instruction cap (256 per call); SHA-256 checksum per instruction for tamper detection. 19/19 unit tests; registered as lane_vm_execute in the MCP gateway.</div>
+      </div>
+    </div>
+    <div class="design-item" style="border-bottom:none;">
+      <div class="design-num">14</div>
+      <div>
+        <div class="design-title">SSO Module — Real OAuth 2.0/OIDC Identity Rail <span class="tag">lane-mcp · Froi-Browser</span></div>
+        <div class="design-desc">Real OAuth 2.0 / OIDC authorization-code client flows (PKCE where supported) for six identity providers — Google, Microsoft, Apple, Amazon, Meta, GitHub — each in its own subdirectory with real, publicly documented endpoints and scopes. Stateless by design (caller persists state/code_verifier between authorize and exchange calls); graceful not_configured degradation without owner-provisioned credentials. Apple partial implementation: authorize_url works; exchange_token returns not_implemented pending an ES256 JWT-signing dependency. 20/20 unit tests; exposed as lane_sso_authorize_url / lane_sso_exchange_token / lane_sso_providers_list and wired into Froi-Browser's Phase 7 left-panel identity rail.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-strip"><span>Page 3 of 4 — Novel Design Systems</span><span>SOVEREIGN IP LICENSE v1 · All Rights Reserved</span></div>
+</section>
+
+<!-- ============================================================== -->
+<!-- PAGE 4 — VISUAL SHOWCASE + VISION                                 -->
+<!-- ============================================================== -->
+<section class="page">
+  <div class="doc-header">
+    <span><strong>ALBERT LANE DIGITAL INFRASTRUCTURE</strong> — Engineering Deliverable Catalog</span>
+    <span>Prepared 2026-08-25</span>
+  </div>
+
+  <div class="page-kicker">Section IV</div>
+  <div class="page-title">Visual Showcase &amp; the Physical-Digital Merger</div>
+
+  <div class="visual-grid">
+    <div class="visual-card">
+      <div class="render">
+        <div class="mock-dash">
+          <div class="mock-panel p1"><div class="t">PROCUREMENT · PERMIT_PIPELINE_BOARD</div><div class="v">14 active · 3 review · 2 approval</div></div>
+          <div class="mock-panel p2"><div class="t">MAPS · TERRAIN_VOLUME_LAYER</div><div class="v">(col,row,layer) elevation lattice</div></div>
+          <div class="mock-panel p3"><div class="t">GOVERNMENT · RISK_PROFILE</div><div class="v">OFAC + EDGAR + EPA ECHO</div></div>
+          <div class="mock-panel p4"><div class="t">LANE-MCP · SSO_IDENTITY_RAIL</div><div class="v">6 providers · PKCE · OAuth 2.0</div></div>
+          <div class="mock-panel p5"><div class="t">＋ Install module…</div><div class="v">capability-gated registry · 46 tools</div></div>
+        </div>
+      </div>
+      <div class="cap">Fig. 1 — MacroHarder Dashboard Composer, design rendering built from the committed layout schema and live design-token palette (src-tauri/src/layout.rs + src/chrome.ts). Government and SSO panels reflect Phase 6 and Phase 16 additions since the prior edition.</div>
+    </div>
+
+    <div class="visual-card">
+      <div class="render" style="padding:0;">
+        <div class="palette-row" style="height:100%;">
+          <div class="swatch" style="background:#0A1628;"><span>PRIMARY<br>0A1628</span></div>
+          <div class="swatch" style="background:#0D1F3C;"><span>SURFACE<br>0D1F3C</span></div>
+          <div class="swatch" style="background:#1E3A5F;"><span>BORDER<br>1E3A5F</span></div>
+          <div class="swatch" style="background:#00D4FF;color:#052;"><span style="color:#052;">ACCENT<br>00D4FF</span></div>
+          <div class="swatch" style="background:#00C896;"><span>SUCCESS<br>00C896</span></div>
+          <div class="swatch" style="background:#FF3860;"><span>DANGER<br>FF3860</span></div>
+        </div>
+      </div>
+      <div class="cap">Fig. 2 — The Sovereign design token palette (design-tokens.json), driving every chrome surface across the estate — one source of truth, not per-app hardcoding. Shared verbatim between MacroHarder and Froi-Browser for cross-app visual consistency.</div>
+    </div>
+  </div>
+
+  <div class="visual-card" style="margin-bottom:14px;">
+    <div class="render">
+      <svg viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;">
+        <defs>
+          <linearGradient id="bld" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#162944"/>
+            <stop offset="100%" stop-color="#0D1F3C"/>
+          </linearGradient>
+        </defs>
+        <rect x="0" y="0" width="900" height="260" fill="#0A1628"/>
+        <!-- ground grid -->
+        <g stroke="#1E3A5F" stroke-width="1" opacity="0.6">
+          <polygon points="450,230 850,150 450,70 50,150" fill="none"/>
+        </g>
+        <!-- isometric city blocks, T2 GlacierNoir palette -->
+        <g>
+          <!-- City Hall -->
+          <polygon points="430,150 490,130 490,70 430,90" fill="url(#bld)" stroke="#00D4FF" stroke-width="1"/>
+          <polygon points="430,90 490,70 460,55 400,75" fill="#1E3A5F" stroke="#00D4FF" stroke-width="1"/>
+          <polygon points="400,75 460,55 460,115 400,135" fill="#0D1F3C" stroke="#1E3A5F" stroke-width="1"/>
+          <!-- Gateway District -->
+          <polygon points="550,175 610,155 610,105 550,125" fill="url(#bld)" stroke="#00C896" stroke-width="1"/>
+          <polygon points="550,125 610,105 580,90 520,110" fill="#1E3A5F"/>
+          <polygon points="520,110 580,90 580,140 520,160" fill="#0D1F3C" stroke="#1E3A5F" stroke-width="1"/>
+          <!-- Intelligence Core -->
+          <polygon points="300,175 360,155 360,95 300,115" fill="url(#bld)" stroke="#00D4FF" stroke-width="1"/>
+          <polygon points="300,115 360,95 330,80 270,100" fill="#1E3A5F"/>
+          <polygon points="270,100 330,80 330,160 270,180" fill="#0D1F3C" stroke="#1E3A5F" stroke-width="1"/>
+          <!-- Sovereign Quarters -->
+          <polygon points="650,195 700,178 700,138 650,155" fill="url(#bld)" stroke="#FF6B35" stroke-width="1"/>
+          <polygon points="650,155 700,138 675,125 625,142" fill="#1E3A5F"/>
+          <polygon points="625,142 675,125 675,182 625,199" fill="#0D1F3C" stroke="#1E3A5F" stroke-width="1"/>
+          <!-- small block -->
+          <polygon points="200,190 240,177 240,145 200,158" fill="url(#bld)" stroke="#7BA7CC" stroke-width="1"/>
+          <polygon points="200,158 240,145 222,135 182,148" fill="#1E3A5F"/>
+          <polygon points="182,148 222,135 222,178 182,191" fill="#0D1F3C" stroke="#1E3A5F" stroke-width="1"/>
+          <!-- SSO Identity Tower (new — Phase 16) -->
+          <polygon points="760,200 800,186 800,156 760,170" fill="url(#bld)" stroke="#00D4FF" stroke-width="1"/>
+          <polygon points="760,170 800,156 782,143 742,157" fill="#1E3A5F"/>
+          <polygon points="742,157 782,143 782,198 742,212" fill="#0D1F3C" stroke="#1E3A5F" stroke-width="1"/>
+        </g>
+        <!-- HUD frame lines suggesting AR overlay -->
+        <g stroke="#00D4FF" stroke-width="1" opacity="0.55" fill="none">
+          <rect x="20" y="20" width="120" height="26" rx="2"/>
+          <rect x="760" y="20" width="120" height="26" rx="2"/>
+          <line x1="430" y1="90" x2="430" y2="40"/>
+          <circle cx="430" cy="34" r="4"/>
+        </g>
+        <text x="30" y="37" fill="#00D4FF" font-family="Courier New, monospace" font-size="10">ZONE: CITY HALL — 100%</text>
+        <text x="770" y="37" fill="#00D4FF" font-family="Courier New, monospace" font-size="10">OVERLAY: LIVE</text>
+        <text x="450" y="252" fill="#7BA7CC" font-family="Courier New, monospace" font-size="11" text-anchor="middle">SIMCITY — T2 GLACIERNOIR — ISOMETRIC CONCEPT RENDERING — 2026-08-25</text>
+      </svg>
+    </div>
+    <div class="cap">Fig. 3 — SimCity concept rendering: the isometric visual system (T2 GlacierNoir palette) that the autonomous generation pipeline produces. The SSO Identity Tower (far right, new) represents the Phase 16 OAuth module. HUD overlay frame anticipates the AR presentation layer described below.</div>
+  </div>
+
+  <div class="vision-block">
+    <h2>Vision — The Physical-Digital Merger</h2>
+    <p>Every system in this catalog is architected as an API-first, headless service precisely because the interface layer is not the destination. The desktop dashboard and the sovereign browser are the current interface; they are not the intended permanent one. The long-term plan is a transition to augmented and virtual reality as the primary way people see and collaboratively build their own civic infrastructure — walking the actual streets and seeing the actual permit pipeline, terrain model, and construction status overlaid in place, not read off a screen at a desk.</p>
+    <p>That transition requires the estate to include everyone in the build-out process, not just engineers with dashboard access — which is why every module in this system is designed around a public, capability-gated interface from day one. It also requires integrating autonomous and robotic systems into physical construction and maintenance under the same provenance, audit, and capability-gating standards already enforced in software — the same taxonomy guards, the same signed ledgers, extended to hardware. <strong>Solidarity Goggles</strong> is the working name for that mixed-reality presentation layer: a shared, not individually-siloed, augmented view of the build-out, designed for the people doing the building, not for a platform selling their attention.</p>
+    <p>None of this requires the current architecture to be rewritten. It requires exactly what has been built: sovereign data, capability-gated module boundaries, cryptographic provenance, and a phase-tracked roadmap — the substrate a mixed-reality and robotics layer plugs into, rather than the wall it has to be torn down to make room for.</p>
+    <div class="vision-tags">
+      <span>AR/VR Presentation Layer</span>
+      <span>Robotics Integration</span>
+      <span>Solidarity Goggles</span>
+      <span>Physical + Digital Provenance</span>
+      <span>Public Capability Access</span>
+      <span>Sovereign Identity · SSO</span>
+    </div>
+  </div>
+
+  <div class="footer-strip"><span>Page 4 of 4 — Visual Showcase &amp; Vision</span><span>SOVEREIGN IP LICENSE v1 · All Rights Reserved</span></div>
+</section>
+
+</body>
+</html>

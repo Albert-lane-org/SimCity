@@ -1,13 +1,16 @@
-#### Canonical Revision 1.1.0
+#### Canonical Revision 1.2.0
 
-> **Latest edition:** [`deliverable-catalog-2026-08-09-v3.html`](deliverable-catalog-2026-08-09-v3.html) — a
-> fourth edition, per owner direction reverting to the original document's exact print-page layout (rejected
-> the third edition's dark/mono redesign) with content updated to the estate's current state: 14 catalogued
-> repositories (government, finance-slack-other, and the Froi-Browser device-key gate added since the third
-> edition), a real GitHub-Actions-independent 8-stage pipeline, and two new novel-design-system entries (the
-> append-only versioned business-plan fact model, and the estate pipeline itself). The illustration/visual
-> design is deliberately untouched from the original — only content changed.
+> **Latest edition:** [`deliverable-catalog-2026-08-25.html`](deliverable-catalog-2026-08-25.html) — the
+> fifth edition, content updated to the estate's current state as of 2026-08-25: 15 catalogued repositories
+> (Froi-Browser promoted to a full catalog entry following Phase 7 SSO Identity Rail merge on 2026-08-22),
+> lane-mcp at 46 tools across 16 modules (SSO Phase 16 — real OAuth 2.0/OIDC for Google/Microsoft/Apple/
+> Amazon/Meta/GitHub), a GitHub-Actions-independent 10-stage estate pipeline (added lockfile_orphan_audit
+> phantom-fix detection), Government Phase 6 EPA/DEQ + DOT data tooling, MacroHarder at 94/94 tests and
+> IPI Modifier Calculator Phase 15, 205+ passing Rust tests estate-wide, and 14 novel design system entries
+> (LaneVM sandboxed interpreter #13 and SSO Module #14 added). The print-page layout and illustration/
+> visual design are retained from the fourth edition — only content changed.
 >
+> [`deliverable-catalog-2026-08-09-v3.html`](deliverable-catalog-2026-08-09-v3.html) (fourth edition),
 > [`deliverable-catalog-2026-08-09-v2.html`](deliverable-catalog-2026-08-09-v2.html) (third edition, dark/mono
 > redesign), [`deliverable-catalog-2026-08-09.html`](deliverable-catalog-2026-08-09.html) (second edition), and
 > the original document below are all retained unchanged.
