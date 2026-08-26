@@ -7,17 +7,6 @@
       "social_post": "SimCity iteration 0: 'Walls rise. The blueprint holds.' \u2014 albertlane.org/SimCity",
       "self_critique": "No prior data. First cycle baseline established.",
       "ab_rationale": "headline_b tests a sovereignty frame vs a construction-progress frame.",
-      "generated": "2026-08-13T05:12:27Z",
-      "ab_winner": "headline_a",
-      "reach_score_at_generation": 0.0
-    },
-    {
-      "headline_a": "SimCity: Iteration 0 \u2014 the city keeps building.",
-      "headline_b": "Sovereign infrastructure: iteration 0 is live.",
-      "article_stub": "The Albert Lane Digital Estate reached iteration 0 today. The city signal reads: 'Walls rise. The blueprint holds.'. Four zones are under active construction. The creative engine rewrites itself each cycle to improve output quality. SimCity is the public window. The infrastructure is the story.",
-      "social_post": "SimCity iteration 0: 'Walls rise. The blueprint holds.' \u2014 albertlane.org/SimCity",
-      "self_critique": "No prior data. First cycle baseline established.",
-      "ab_rationale": "headline_b tests a sovereignty frame vs a construction-progress frame.",
       "generated": "2026-08-13T09:11:44Z",
       "ab_winner": "headline_b",
       "reach_score_at_generation": 0.0
@@ -527,12 +516,23 @@
       "generated": "2026-08-26T00:22:13Z",
       "ab_winner": "headline_b",
       "reach_score_at_generation": 0.0
+    },
+    {
+      "headline_a": "SimCity: Iteration 0 \u2014 the city keeps building.",
+      "headline_b": "Sovereign infrastructure: iteration 0 is live.",
+      "article_stub": "The Albert Lane Digital Estate reached iteration 0 today. The city signal reads: 'Walls rise. The blueprint holds.'. Four zones are under active construction. The creative engine rewrites itself each cycle to improve output quality. SimCity is the public window. The infrastructure is the story.",
+      "social_post": "SimCity iteration 0: 'Walls rise. The blueprint holds.' \u2014 albertlane.org/SimCity",
+      "self_critique": "No prior data. First cycle baseline established.",
+      "ab_rationale": "headline_b tests a sovereignty frame vs a construction-progress frame.",
+      "generated": "2026-08-26T00:41:03Z",
+      "ab_winner": "headline_a",
+      "reach_score_at_generation": 0.0
     }
   ],
   "last_headline": "SimCity: Iteration 0 \u2014 the city keeps building.",
   "reach_score": 0.0,
   "self_critique": "No prior data. First cycle baseline established.",
-  "ab_winner": "headline_b",
+  "ab_winner": "headline_a",
   "iteration": 0,
   "_meta": {
     "authored_by": "Albert Lane | SovereignAudits\u2122",
