@@ -1,15 +1,15 @@
-#### Canonical Revision 1.2.0
+#### Canonical Revision 1.3.0
 
-> **Latest edition:** [`deliverable-catalog-2026-08-25.html`](deliverable-catalog-2026-08-25.html) — the
-> fifth edition, content updated to the estate's current state as of 2026-08-25: 15 catalogued repositories
-> (Froi-Browser promoted to a full catalog entry following Phase 7 SSO Identity Rail merge on 2026-08-22),
-> lane-mcp at 46 tools across 16 modules (SSO Phase 16 — real OAuth 2.0/OIDC for Google/Microsoft/Apple/
-> Amazon/Meta/GitHub), a GitHub-Actions-independent 10-stage estate pipeline (added lockfile_orphan_audit
-> phantom-fix detection), Government Phase 6 EPA/DEQ + DOT data tooling, MacroHarder at 94/94 tests and
-> IPI Modifier Calculator Phase 15, 205+ passing Rust tests estate-wide, and 14 novel design system entries
-> (LaneVM sandboxed interpreter #13 and SSO Module #14 added). The print-page layout and illustration/
-> visual design are retained from the fourth edition — only content changed.
+> **Latest edition:** [`deliverable-catalog-2026-08-30.html`](deliverable-catalog-2026-08-30.html) — the
+> sixth edition, content updated to the estate's current state as of 2026-08-30: 15 catalogued repositories,
+> 10-stage estate pipeline confirmed running across multiple live cycles (first Sunday skill_improver
+> propose-only pass confirmed 2026-08-30), lockfile orphan audit (Stage 5, added 2026-08-18) confirmed
+> running with 96/96 total agent suite tests verified, Froi-Browser FB-010 (Cloudflare Workers Builds
+> auto-connected — owner dashboard action required), CI baseline holds at 5/14 green (lane-mcp,
+> Sovereign-Canary, SimCity, Finance-Slack-Other, Channel-1-News) with no regressions. The print-page
+> layout and illustration/visual design are retained from the fourth edition — only content changed.
 >
+> [`deliverable-catalog-2026-08-25.html`](deliverable-catalog-2026-08-25.html) (fifth edition),
 > [`deliverable-catalog-2026-08-09-v3.html`](deliverable-catalog-2026-08-09-v3.html) (fourth edition),
 > [`deliverable-catalog-2026-08-09-v2.html`](deliverable-catalog-2026-08-09-v2.html) (third edition, dark/mono
 > redesign), [`deliverable-catalog-2026-08-09.html`](deliverable-catalog-2026-08-09.html) (second edition), and
