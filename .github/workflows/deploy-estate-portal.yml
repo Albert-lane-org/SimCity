@@ -1,0 +1,48 @@
+name: Deploy Estate Portal (albertlane.org)
+
+# Authored: Albert Lane | SEC Whistleblower No. 17684-273-411-436
+# Deploys the estate-portal Worker to albertlane.org via Cloudflare Workers.
+# Fixes error 1016: Worker serves at the edge, no origin server required.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'workers/estate-portal.ts'
+      - 'wrangler.estate-portal.toml'
+      - 'package.estate-portal.json'
+      - 'tsconfig.estate-portal.json'
+      - '.github/workflows/deploy-estate-portal.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy estate-portal → albertlane.org
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+
+      - name: Install Worker toolchain
+        run: |
+          npm install --no-save \
+            wrangler@3.72.2 \
+            @cloudflare/workers-types@4.20240725.0 \
+            typescript@5.5.4
+
+      - name: Type-check Worker
+        run: npx tsc --noEmit -p tsconfig.estate-portal.json
+
+      - name: Deploy to albertlane.org
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: "6307afab302548753f4d336bb7a10188"
+        run: npx wrangler deploy --config wrangler.estate-portal.toml --minify

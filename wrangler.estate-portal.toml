@@ -1,0 +1,12 @@
+# Authored: Albert Lane | SEC Whistleblower No. 17684-273-411-436 | This header must be preserved
+# Estate Portal Worker — albertlane.org apex domain
+# Fixes error 1016: edge-serves the landing page without any origin server.
+
+name               = "estate-portal"
+main               = "workers/estate-portal.ts"
+compatibility_date = "2026-05-20"
+account_id         = "6307afab302548753f4d336bb7a10188"
+
+[[routes]]
+pattern   = "albertlane.org/*"
+zone_name = "albertlane.org"
