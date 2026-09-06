@@ -33,9 +33,9 @@ jobs:
 
       - name: Install Worker toolchain
         run: |
-          npm install --no-save \
+          npm install --no-save --legacy-peer-deps \
             wrangler@3.72.2 \
-            @cloudflare/workers-types@4.20240725.0 \
+            @cloudflare/workers-types@4.20260702.1 \
             typescript@5.5.4
 
       - name: Type-check Worker
